@@ -6,15 +6,6 @@ const RETRY_DELAYS = [2000, 4000, 8000]
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = (error) => reject(error)
-  })
-}
-
 const parseNumber = (val: any): number => {
   if (typeof val === 'number') return val
   if (typeof val === 'string') {
@@ -56,33 +47,39 @@ const sanitizeQuoteData = (quote: any): QuoteData => {
 
 export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Promise<QuoteData> => {
   try {
-    const base64String = await fileToBase64(file)
-    const fileData = base64String.split(',')[1]
-
-    if (!fileData) {
-      throw new Error('Falha ao ler o conteúdo do arquivo PDF localmente.')
-    }
-
     // Limpar o nome do arquivo para evitar conflitos com caracteres especiais no backend
     const cleanFileName = file.name.replace(/[^\w\s.-]/gi, '').trim() || 'arquivo_desconhecido.pdf'
 
+    // Usar FormData para evitar overhead de base64 que pode causar timeout ou Payload Too Large
+    const formData = new FormData()
+    formData.append('file', file, cleanFileName)
+    formData.append('fileName', cleanFileName)
+    formData.append('mimeType', file.type)
+
     const { data, error } = await supabase.functions.invoke('analyze-quote', {
-      body: {
-        fileName: cleanFileName,
-        fileData,
-        mimeType: file.type,
-      },
+      body: formData,
     })
 
     if (error) {
       console.error('Supabase invoke error:', error)
-      if (error.message?.includes('429') && attempt < MAX_RETRIES) {
-        console.warn(`Rate limit hit. Retrying in ${RETRY_DELAYS[attempt]}ms...`)
+
+      const isNetworkOrTimeout =
+        error.message === 'Failed to send a request to the Edge Function' ||
+        error.message?.includes('FetchError')
+      const isRateLimit = error.message?.includes('429')
+
+      if ((isRateLimit || isNetworkOrTimeout) && attempt < MAX_RETRIES) {
+        console.warn(`Transient error or rate limit hit. Retrying in ${RETRY_DELAYS[attempt]}ms...`)
         await delay(RETRY_DELAYS[attempt])
         return extractQuoteFromPdf(file, attempt + 1)
       }
 
       let serverErrorMsg = error.message
+
+      if (isNetworkOrTimeout) {
+        serverErrorMsg =
+          'A conexão com o servidor falhou ou expirou. O arquivo pode ser muito grande ou a conexão caiu. Tente novamente com um PDF menor.'
+      }
 
       // Melhoria no feedback de erro para retornos HTTP de falha (ex: 400 Bad Request)
       if (error.message?.includes('HTTP 400')) {

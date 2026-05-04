@@ -16,18 +16,42 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const bodyText = await req.text()
-    if (!bodyText) {
-      throw new Error('Corpo da requisição vazio.')
-    }
+    const contentType = req.headers.get('content-type') || ''
+    let fileData = ''
+    let mimeType = ''
+    let fileName = ''
+    let fileBuffer: Buffer | null = null
 
-    const body = JSON.parse(bodyText)
-    const fileData = body.fileData
-    const mimeType = body.mimeType
-    const fileName = body.fileName
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await req.formData()
+      const file = formData.get('file') as File | null
+      if (!file) throw new Error('Nenhum arquivo fornecido no FormData.')
 
-    if (!fileData) {
-      throw new Error('Nenhum dado de arquivo (fileData) fornecido.')
+      const arrayBuffer = await file.arrayBuffer()
+      fileBuffer = Buffer.from(new Uint8Array(arrayBuffer))
+      mimeType = file.type || (formData.get('mimeType') as string) || 'application/pdf'
+      fileName = file.name || (formData.get('fileName') as string) || 'arquivo.pdf'
+
+      // Se não for PDF (ex: imagem), precisamos do base64 para a API da OpenAI
+      if (!mimeType.includes('pdf')) {
+        const chunks: string[] = []
+        const chunkSize = 8192
+        for (let i = 0; i < fileBuffer.length; i += chunkSize) {
+          chunks.push(String.fromCharCode(...Array.from(fileBuffer.subarray(i, i + chunkSize))))
+        }
+        fileData = btoa(chunks.join(''))
+      }
+    } else {
+      const bodyText = await req.text()
+      if (!bodyText) throw new Error('Corpo da requisição vazio.')
+
+      const body = JSON.parse(bodyText)
+      fileData = body.fileData
+      mimeType = body.mimeType
+      fileName = body.fileName
+      if (!fileData) throw new Error('Nenhum dado de arquivo fornecido.')
+
+      fileBuffer = Buffer.from(fileData, 'base64')
     }
 
     const apiKey = Deno.env.get('OPENAI_API_KEY')
@@ -41,11 +65,10 @@ Deno.serve(async (req: Request) => {
 
     if (mimeType === 'application/pdf') {
       try {
-        const fileBuffer = Buffer.from(fileData, 'base64')
-
         // Tolerância a variações de estrutura e metadados atípicos
-        const pdfData = await pdf(fileBuffer, {
-          max: 0,
+        // Limite de 5 páginas para evitar timeout e consumo excessivo de memória
+        const pdfData = await pdf(fileBuffer!, {
+          max: 5,
           pagerender: function (pageData: any) {
             return pageData
               .getTextContent({
