@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -9,10 +9,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function Login() {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const { signInWithOtp } = useAuth()
+  const { signIn, user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+
+  useEffect(() => {
+    if (user) {
+      navigate(location.state?.from?.pathname || '/', { replace: true })
+    }
+  }, [user, navigate, location])
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,13 +32,16 @@ export default function Login() {
 
     setLoading(true)
     try {
-      const { error } = await signInWithOtp(email)
+      const { error } = await signIn(email, password)
 
       if (error) throw error
 
-      toast.success('Link enviado!', { description: 'Verifique seu email para acessar o sistema.' })
+      toast.success('Login realizado com sucesso!')
+      navigate(location.state?.from?.pathname || '/', { replace: true })
     } catch (error: any) {
-      toast.error('Erro na autenticação', { description: error.message })
+      toast.error('Erro na autenticação', {
+        description: 'Verifique suas credenciais e tente novamente.',
+      })
     } finally {
       setLoading(false)
     }
@@ -53,28 +63,35 @@ export default function Login() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleAuth} className="space-y-5">
-            <div className="space-y-2">
-              <Input
-                type="email"
-                placeholder="seu.nome@brasporto.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-gray-50 h-12 border-gray-200 focus-visible:ring-[#FF6B35]"
-              />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="email"
+                  placeholder="seu.nome@brasporto.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-gray-50 h-12 border-gray-200 focus-visible:ring-[#FF6B35]"
+                />
+              </div>
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  placeholder="Sua senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-gray-50 h-12 border-gray-200 focus-visible:ring-[#FF6B35]"
+                />
+              </div>
             </div>
             <Button
               type="submit"
               className="w-full h-12 text-md font-medium bg-[#003366] hover:bg-[#003366]/90"
               disabled={loading}
             >
-              {loading ? 'Aguarde...' : 'Enviar Link de Acesso'}
+              {loading ? 'Aguarde...' : 'Entrar'}
             </Button>
-            <div className="text-center mt-4">
-              <p className="text-sm text-gray-500">
-                Verifique seu email para acessar após enviar o link.
-              </p>
-            </div>
           </form>
         </CardContent>
       </Card>

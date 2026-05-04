@@ -134,6 +134,80 @@ export type Database = {
           },
         ]
       }
+      cotacoes: {
+        Row: {
+          agente: string
+          componentes: Json | null
+          created_at: string
+          destino: string
+          eta: string | null
+          etd: string
+          free_time: number | null
+          id: string
+          incoterm: string
+          modal: string | null
+          moeda_original: string | null
+          numero_cotacao: string | null
+          origem: string
+          peso_volume: number | null
+          status: string | null
+          updated_at: string
+          user_id: string
+          valor_brl: number | null
+          valor_total: number | null
+        }
+        Insert: {
+          agente: string
+          componentes?: Json | null
+          created_at?: string
+          destino: string
+          eta?: string | null
+          etd: string
+          free_time?: number | null
+          id?: string
+          incoterm: string
+          modal?: string | null
+          moeda_original?: string | null
+          numero_cotacao?: string | null
+          origem: string
+          peso_volume?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+          valor_brl?: number | null
+          valor_total?: number | null
+        }
+        Update: {
+          agente?: string
+          componentes?: Json | null
+          created_at?: string
+          destino?: string
+          eta?: string | null
+          etd?: string
+          free_time?: number | null
+          id?: string
+          incoterm?: string
+          modal?: string | null
+          moeda_original?: string | null
+          numero_cotacao?: string | null
+          origem?: string
+          peso_volume?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+          valor_brl?: number | null
+          valor_total?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'cotacoes_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'usuarios'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       documents: {
         Row: {
           created_at: string
@@ -303,6 +377,53 @@ export type Database = {
           },
         ]
       }
+      scoring: {
+        Row: {
+          cotacao_id: string
+          created_at: string
+          custo_nota: number | null
+          etd_nota: number | null
+          free_time_nota: number | null
+          id: string
+          justificativa: string | null
+          nota_final: number | null
+          ranking: number | null
+          tempo_nota: number | null
+        }
+        Insert: {
+          cotacao_id: string
+          created_at?: string
+          custo_nota?: number | null
+          etd_nota?: number | null
+          free_time_nota?: number | null
+          id?: string
+          justificativa?: string | null
+          nota_final?: number | null
+          ranking?: number | null
+          tempo_nota?: number | null
+        }
+        Update: {
+          cotacao_id?: string
+          created_at?: string
+          custo_nota?: number | null
+          etd_nota?: number | null
+          free_time_nota?: number | null
+          id?: string
+          justificativa?: string | null
+          nota_final?: number | null
+          ranking?: number | null
+          tempo_nota?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'scoring_cotacao_id_fkey'
+            columns: ['cotacao_id']
+            isOneToOne: false
+            referencedRelation: 'cotacoes'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       status_history: {
         Row: {
           created_at: string
@@ -351,6 +472,33 @@ export type Database = {
           id?: string
           name?: string
           type?: string | null
+        }
+        Relationships: []
+      }
+      usuarios: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          nome: string | null
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          nome?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          nome?: string | null
+          role?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -527,6 +675,26 @@ export const Constants = {
 //   status: text (nullable, default: 'draft'::text)
 //   total_amount: numeric (nullable)
 //   created_at: timestamp with time zone (not null, default: now())
+// Table: cotacoes
+//   id: uuid (not null, default: gen_random_uuid())
+//   user_id: uuid (not null)
+//   numero_cotacao: text (nullable)
+//   modal: text (nullable)
+//   agente: text (not null)
+//   origem: text (not null)
+//   destino: text (not null)
+//   incoterm: text (not null)
+//   etd: date (not null)
+//   eta: date (nullable)
+//   free_time: integer (nullable)
+//   peso_volume: numeric (nullable)
+//   moeda_original: text (nullable)
+//   valor_total: numeric (nullable)
+//   componentes: jsonb (nullable)
+//   valor_brl: numeric (nullable)
+//   status: text (nullable, default: 'rascunho'::text)
+//   created_at: timestamp with time zone (not null, default: now())
+//   updated_at: timestamp with time zone (not null, default: now())
 // Table: documents
 //   id: uuid (not null, default: gen_random_uuid())
 //   reference_id: uuid (not null)
@@ -568,6 +736,17 @@ export const Constants = {
 //   destination: text (not null)
 //   transit_time: integer (nullable)
 //   created_at: timestamp with time zone (not null, default: now())
+// Table: scoring
+//   id: uuid (not null, default: gen_random_uuid())
+//   cotacao_id: uuid (not null)
+//   custo_nota: numeric (nullable)
+//   tempo_nota: numeric (nullable)
+//   etd_nota: numeric (nullable)
+//   free_time_nota: numeric (nullable)
+//   nota_final: numeric (nullable)
+//   ranking: integer (nullable)
+//   justificativa: text (nullable)
+//   created_at: timestamp with time zone (not null, default: now())
 // Table: status_history
 //   id: uuid (not null, default: gen_random_uuid())
 //   reference_id: uuid (not null)
@@ -581,6 +760,13 @@ export const Constants = {
 //   name: text (not null)
 //   type: text (nullable)
 //   created_at: timestamp with time zone (not null, default: now())
+// Table: usuarios
+//   id: uuid (not null)
+//   email: text (not null)
+//   nome: text (nullable)
+//   role: text (nullable)
+//   created_at: timestamp with time zone (not null, default: now())
+//   updated_at: timestamp with time zone (not null, default: now())
 
 // --- CONSTRAINTS ---
 // Table: agents
@@ -594,6 +780,12 @@ export const Constants = {
 //   FOREIGN KEY commercial_proposals_client_id_fkey: FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
 //   PRIMARY KEY commercial_proposals_pkey: PRIMARY KEY (id)
 //   FOREIGN KEY commercial_proposals_quote_id_fkey: FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE
+// Table: cotacoes
+//   CHECK cotacoes_modal_check: CHECK ((modal = ANY (ARRAY['Aéreo'::text, 'FCL'::text, 'LCL'::text])))
+//   UNIQUE cotacoes_numero_cotacao_key: UNIQUE (numero_cotacao)
+//   PRIMARY KEY cotacoes_pkey: PRIMARY KEY (id)
+//   CHECK cotacoes_status_check: CHECK ((status = ANY (ARRAY['rascunho'::text, 'conferido'::text, 'scoring'::text, 'finalizado'::text])))
+//   FOREIGN KEY cotacoes_user_id_fkey: FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
 // Table: documents
 //   PRIMARY KEY documents_pkey: PRIMARY KEY (id)
 // Table: profiles
@@ -608,11 +800,24 @@ export const Constants = {
 // Table: routes
 //   PRIMARY KEY routes_pkey: PRIMARY KEY (id)
 //   FOREIGN KEY routes_quote_id_fkey: FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE
+// Table: scoring
+//   FOREIGN KEY scoring_cotacao_id_fkey: FOREIGN KEY (cotacao_id) REFERENCES cotacoes(id) ON DELETE CASCADE
+//   CHECK scoring_custo_nota_check: CHECK (((custo_nota >= (0)::numeric) AND (custo_nota <= (10)::numeric)))
+//   CHECK scoring_etd_nota_check: CHECK (((etd_nota >= (0)::numeric) AND (etd_nota <= (10)::numeric)))
+//   CHECK scoring_free_time_nota_check: CHECK (((free_time_nota >= (0)::numeric) AND (free_time_nota <= (10)::numeric)))
+//   CHECK scoring_nota_final_check: CHECK (((nota_final >= (0)::numeric) AND (nota_final <= (10)::numeric)))
+//   PRIMARY KEY scoring_pkey: PRIMARY KEY (id)
+//   CHECK scoring_tempo_nota_check: CHECK (((tempo_nota >= (0)::numeric) AND (tempo_nota <= (10)::numeric)))
 // Table: status_history
 //   FOREIGN KEY status_history_created_by_fkey: FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE SET NULL
 //   PRIMARY KEY status_history_pkey: PRIMARY KEY (id)
 // Table: suppliers
 //   PRIMARY KEY suppliers_pkey: PRIMARY KEY (id)
+// Table: usuarios
+//   UNIQUE usuarios_email_key: UNIQUE (email)
+//   FOREIGN KEY usuarios_id_fkey: FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
+//   PRIMARY KEY usuarios_pkey: PRIMARY KEY (id)
+//   CHECK usuarios_role_check: CHECK ((role = ANY (ARRAY['analista'::text, 'gerente'::text])))
 
 // --- ROW LEVEL SECURITY POLICIES ---
 // Table: agents
@@ -655,6 +860,16 @@ export const Constants = {
 //   Policy "authenticated_update" (UPDATE, PERMISSIVE) roles={authenticated}
 //     USING: true
 //     WITH CHECK: true
+// Table: cotacoes
+//   Policy "cotacoes_delete" (DELETE, PERMISSIVE) roles={authenticated}
+//     USING: (auth.uid() = user_id)
+//   Policy "cotacoes_insert" (INSERT, PERMISSIVE) roles={authenticated}
+//     WITH CHECK: (auth.uid() = user_id)
+//   Policy "cotacoes_select" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: (auth.uid() = user_id)
+//   Policy "cotacoes_update" (UPDATE, PERMISSIVE) roles={authenticated}
+//     USING: (auth.uid() = user_id)
+//     WITH CHECK: (auth.uid() = user_id)
 // Table: documents
 //   Policy "authenticated_delete" (DELETE, PERMISSIVE) roles={authenticated}
 //     USING: true
@@ -705,6 +920,16 @@ export const Constants = {
 //   Policy "authenticated_update" (UPDATE, PERMISSIVE) roles={authenticated}
 //     USING: true
 //     WITH CHECK: true
+// Table: scoring
+//   Policy "scoring_delete" (DELETE, PERMISSIVE) roles={authenticated}
+//     USING: (EXISTS ( SELECT 1    FROM cotacoes   WHERE ((cotacoes.id = scoring.cotacao_id) AND (cotacoes.user_id = auth.uid()))))
+//   Policy "scoring_insert" (INSERT, PERMISSIVE) roles={authenticated}
+//     WITH CHECK: (EXISTS ( SELECT 1    FROM cotacoes   WHERE ((cotacoes.id = scoring.cotacao_id) AND (cotacoes.user_id = auth.uid()))))
+//   Policy "scoring_select" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: (EXISTS ( SELECT 1    FROM cotacoes   WHERE ((cotacoes.id = scoring.cotacao_id) AND (cotacoes.user_id = auth.uid()))))
+//   Policy "scoring_update" (UPDATE, PERMISSIVE) roles={authenticated}
+//     USING: (EXISTS ( SELECT 1    FROM cotacoes   WHERE ((cotacoes.id = scoring.cotacao_id) AND (cotacoes.user_id = auth.uid()))))
+//     WITH CHECK: (EXISTS ( SELECT 1    FROM cotacoes   WHERE ((cotacoes.id = scoring.cotacao_id) AND (cotacoes.user_id = auth.uid()))))
 // Table: status_history
 //   Policy "authenticated_delete" (DELETE, PERMISSIVE) roles={authenticated}
 //     USING: true
@@ -725,6 +950,14 @@ export const Constants = {
 //   Policy "authenticated_update" (UPDATE, PERMISSIVE) roles={authenticated}
 //     USING: true
 //     WITH CHECK: true
+// Table: usuarios
+//   Policy "usuarios_insert" (INSERT, PERMISSIVE) roles={authenticated}
+//     WITH CHECK: (auth.uid() = id)
+//   Policy "usuarios_select" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: (auth.uid() = id)
+//   Policy "usuarios_update" (UPDATE, PERMISSIVE) roles={authenticated}
+//     USING: (auth.uid() = id)
+//     WITH CHECK: (auth.uid() = id)
 
 // --- DATABASE FUNCTIONS ---
 // FUNCTION check_brasporto_email()
@@ -741,3 +974,23 @@ export const Constants = {
 //   END;
 //   $function$
 //
+// FUNCTION handle_new_usuario()
+//   CREATE OR REPLACE FUNCTION public.handle_new_usuario()
+//    RETURNS trigger
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//   BEGIN
+//     INSERT INTO public.usuarios (id, email, nome, role)
+//     VALUES (NEW.id, NEW.email, NEW.raw_user_meta_data->>'name', 'analista')
+//     ON CONFLICT (id) DO NOTHING;
+//     RETURN NEW;
+//   END;
+//   $function$
+//
+
+// --- INDEXES ---
+// Table: cotacoes
+//   CREATE UNIQUE INDEX cotacoes_numero_cotacao_key ON public.cotacoes USING btree (numero_cotacao)
+// Table: usuarios
+//   CREATE UNIQUE INDEX usuarios_email_key ON public.usuarios USING btree (email)
