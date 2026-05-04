@@ -39,8 +39,9 @@ export default function Login() {
       toast.success('Login realizado com sucesso!')
       navigate(location.state?.from?.pathname || '/', { replace: true })
     } catch (error: any) {
+      console.error('Auth error:', error)
       toast.error('Erro na autenticação', {
-        description: 'Verifique suas credenciais e tente novamente.',
+        description: 'E-mail ou senha incorretos. Verifique suas credenciais.',
       })
     } finally {
       setLoading(false)
