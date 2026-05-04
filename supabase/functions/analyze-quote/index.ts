@@ -88,7 +88,8 @@ REGRAS CRÍTICAS:
 1. Valores numéricos (taxas, peso, totais) devem ser extraídos como NÚMERO (float). Exemplo: se o texto diz "1.500,50", converta para 1500.50. NUNCA envie strings para valores monetários ou pesos. Remova os símbolos monetários (USD, R$, EUR).
 2. Identifique corretamente os nomes das taxas e suas respectivas moedas.
 3. Datas devem estar no formato YYYY-MM-DD. Converta outros formatos.
-4. Se um campo não constar na cotação, retorne null.
+4. ATENÇÃO CRÍTICA AO PESO (weight): Procure detalhadamente por indicadores como "KG", "Kgs", "Gross Weight" ou "Detalhes de carga" (ex: "1cx - 89 x 69 x 96 cm - 60 KG" -> weight é 60). Certifique-se de extrair o peso correto e NÃO o confunda com dimensões (cm) ou quantidades de caixas (cx).
+5. Se um campo não constar na cotação, retorne null.
 
 Schema esperado:
 {
