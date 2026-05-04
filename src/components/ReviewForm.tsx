@@ -118,13 +118,13 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
 
   const onSubmit = async (data: ReviewFormValues) => {
     try {
-      await saveQuoteToDb(data as any)
-      toast.success('Cotação salva com sucesso', {
+      await saveQuoteToDb({ ...data, id: initialData.id, status: 'conferido' } as any)
+      toast.success('Cotação salva com sucesso!', {
         description: 'Os dados foram validados e gravados no banco de dados.',
       })
       setTimeout(onBack, 1500)
     } catch (error: any) {
-      toast.error('Erro ao salvar cotação', {
+      toast.error('Erro ao salvar. Tente novamente.', {
         description: error.message || 'Ocorreu um erro inesperado.',
       })
     }

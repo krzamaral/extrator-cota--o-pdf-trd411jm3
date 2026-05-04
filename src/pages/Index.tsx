@@ -27,6 +27,13 @@ export default function Index() {
       try {
         const data = await extractQuoteFromPdf(pFile.file)
 
+        try {
+          const dbRecord = await saveQuoteToDb({ ...data, status: 'rascunho' })
+          data.id = dbRecord.id
+        } catch (dbError: any) {
+          console.error('Erro ao salvar rascunho:', dbError)
+        }
+
         setProcessedFiles((current) =>
           current.map((f) => (f.id === pFile.id ? { ...f, status: 'success', data } : f)),
         )
@@ -49,6 +56,14 @@ export default function Index() {
 
     try {
       const data = await extractQuoteFromPdf(file)
+
+      try {
+        const dbRecord = await saveQuoteToDb({ ...data, status: 'rascunho' })
+        data.id = dbRecord.id
+      } catch (dbError: any) {
+        console.error('Erro ao salvar rascunho:', dbError)
+      }
+
       setProcessedFiles((current) =>
         current.map((f) => (f.id === id ? { ...f, status: 'success', data } : f)),
       )

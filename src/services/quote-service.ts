@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase/client'
 import { QuoteData } from '@/types/quote'
 
 const MAX_RETRIES = 3
-const RETRY_DELAYS = [2000, 4000, 8000] // 2s, 4s, 8s for 429 errors
+const RETRY_DELAYS = [2000, 4000, 8000]
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -17,22 +17,17 @@ const fileToBase64 = (file: File): Promise<string> => {
 
 export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Promise<QuoteData> => {
   try {
-    // Artificial delay to simulate processing for a better UX while we use mock data
-    await delay(1500)
-
     const base64String = await fileToBase64(file)
 
-    // We attempt to call the Supabase Edge Function which securely holds the OPENAI_API_KEY
     const { data, error } = await supabase.functions.invoke('analyze-quote', {
       body: {
         fileName: file.name,
-        fileData: base64String.split(',')[1], // Send only base64 content
+        fileData: base64String.split(',')[1],
         mimeType: file.type,
       },
     })
 
     if (error) {
-      // Check if it's a rate limit error to apply exponential backoff
       if (error.message?.includes('429') && attempt < MAX_RETRIES) {
         console.warn(`Rate limit hit. Retrying in ${RETRY_DELAYS[attempt]}ms...`)
         await delay(RETRY_DELAYS[attempt])
@@ -52,46 +47,56 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
   }
 }
 
-export const saveQuoteToDb = async (quoteData: QuoteData) => {
+export const saveQuoteToDb = async (quoteData: QuoteData & { status?: string }) => {
   const {
     data: { session },
   } = await supabase.auth.getSession()
 
   if (!session?.user) throw new Error('Usuário não autenticado')
 
-  const { data: quote, error: quoteError } = await supabase
-    .from('quotes')
-    .insert({
-      quote_number: quoteData.quoteNumber,
-      modal: quoteData.modal,
-      agent_name: quoteData.agent,
-      origin: quoteData.origin,
-      destination: quoteData.destination,
-      incoterm: quoteData.incoterm,
-      etd: quoteData.etd,
-      eta: quoteData.eta || null,
-      free_time: quoteData.freeTime,
-      weight: quoteData.weight,
-      currency: quoteData.currency,
-      user_id: session.user.id,
-    })
-    .select()
-    .single()
+  const componentes =
+    quoteData.tariffs?.reduce(
+      (acc, t) => {
+        acc[t.name] = { valor: t.value, moeda: t.currency }
+        return acc
+      },
+      {} as Record<string, any>,
+    ) || {}
 
-  if (quoteError) throw quoteError
+  const total = quoteData.tariffs?.reduce((sum, t) => sum + (Number(t.value) || 0), 0) || 0
 
-  if (quoteData.tariffs && quoteData.tariffs.length > 0) {
-    const tariffsToInsert = quoteData.tariffs.map((t) => ({
-      quote_id: quote.id,
-      name: t.name,
-      value: t.value,
-      currency: t.currency,
-    }))
-
-    const { error: tariffsError } = await supabase.from('quote_tariffs').insert(tariffsToInsert)
-
-    if (tariffsError) throw tariffsError
+  const payload = {
+    user_id: session.user.id,
+    numero_cotacao: quoteData.quoteNumber || `COT-${Date.now()}`,
+    modal: quoteData.modal || 'Aéreo',
+    agente: quoteData.agent || 'Desconhecido',
+    origem: quoteData.origin || 'Desconhecido',
+    destino: quoteData.destination || 'Desconhecido',
+    incoterm: quoteData.incoterm || 'EXW',
+    etd: quoteData.etd || new Date().toISOString().split('T')[0],
+    eta: quoteData.eta || null,
+    free_time: quoteData.freeTime || 0,
+    peso_volume: quoteData.weight || 0,
+    moeda_original: quoteData.currency || 'USD',
+    valor_total: total,
+    componentes,
+    status: quoteData.status || 'conferido',
   }
 
-  return quote
+  if (quoteData.id) {
+    const { data, error } = await supabase
+      .from('cotacoes')
+      .update(payload)
+      .eq('id', quoteData.id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  } else {
+    const { data, error } = await supabase.from('cotacoes').insert(payload).select().single()
+
+    if (error) throw error
+    return data
+  }
 }

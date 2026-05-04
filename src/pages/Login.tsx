@@ -9,14 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function Login() {
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isSignUp, setIsSignUp] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { signIn, signUp } = useAuth()
+  const { signInWithOtp } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-
-  const from = location.state?.from?.pathname || '/'
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,16 +25,11 @@ export default function Login() {
 
     setLoading(true)
     try {
-      const { error } = isSignUp ? await signUp(email, password) : await signIn(email, password)
+      const { error } = await signInWithOtp(email)
 
       if (error) throw error
 
-      if (isSignUp) {
-        toast.success('Conta criada!', { description: 'Verifique seu email ou faça login.' })
-        setIsSignUp(false)
-      } else {
-        navigate(from, { replace: true })
-      }
+      toast.success('Link enviado!', { description: 'Verifique seu email para acessar o sistema.' })
     } catch (error: any) {
       toast.error('Erro na autenticação', { description: error.message })
     } finally {
@@ -47,20 +38,18 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <Card className="w-full max-w-md shadow-lg border-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+      <Card className="w-full max-w-md shadow-lg border-gray-100">
         <CardHeader className="text-center space-y-2 pb-6">
           <div className="flex justify-center mb-4">
             <div className="bg-primary p-3 rounded-xl text-primary-foreground shadow-sm">
               <Package2 className="w-8 h-8" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold font-heading">Portal Brasporto</CardTitle>
-          <CardDescription>
-            {isSignUp
-              ? 'Crie sua conta de acesso corporativo'
-              : 'Faça login para acessar o sistema'}
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold font-heading text-[#003366]">
+            Portal Brasporto
+          </CardTitle>
+          <CardDescription>Acesse a plataforma de gestão de cotações</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleAuth} className="space-y-5">
@@ -71,30 +60,20 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-gray-50 h-12"
+                className="bg-gray-50 h-12 border-gray-200 focus-visible:ring-[#FF6B35]"
               />
             </div>
-            <div className="space-y-2">
-              <Input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-gray-50 h-12"
-              />
-            </div>
-            <Button type="submit" className="w-full h-12 text-md font-medium" disabled={loading}>
-              {loading ? 'Aguarde...' : isSignUp ? 'Criar Conta' : 'Entrar'}
+            <Button
+              type="submit"
+              className="w-full h-12 text-md font-medium bg-[#003366] hover:bg-[#003366]/90"
+              disabled={loading}
+            >
+              {loading ? 'Aguarde...' : 'Enviar Link de Acesso'}
             </Button>
-            <div className="text-center mt-6">
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm text-primary font-medium hover:underline"
-              >
-                {isSignUp ? 'Já tenho uma conta' : 'Criar nova conta'}
-              </button>
+            <div className="text-center mt-4">
+              <p className="text-sm text-gray-500">
+                Verifique seu email para acessar após enviar o link.
+              </p>
             </div>
           </form>
         </CardContent>

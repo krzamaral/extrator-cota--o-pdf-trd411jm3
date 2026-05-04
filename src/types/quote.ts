@@ -5,6 +5,7 @@ export interface TariffComponent {
 }
 
 export interface QuoteData {
+  id?: string
   quoteNumber?: string
   modal: string
   agent: string
