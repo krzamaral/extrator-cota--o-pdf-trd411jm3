@@ -1,5 +1,7 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import OpenAI from 'npm:openai'
+import pdf from 'npm:pdf-parse'
+import { Buffer } from 'node:buffer'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,8 +9,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers':
     'authorization, x-client-info, x-supabase-client-platform, apikey, content-type',
 }
-import pdf from 'npm:pdf-parse'
-import { Buffer } from 'node:buffer'
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {

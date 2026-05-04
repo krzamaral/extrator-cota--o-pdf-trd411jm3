@@ -50,14 +50,24 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
     // Limpar o nome do arquivo para evitar conflitos com caracteres especiais no backend
     const cleanFileName = file.name.replace(/[^\w\s.-]/gi, '').trim() || 'arquivo_desconhecido.pdf'
 
-    // Usar FormData para evitar overhead de base64 que pode causar timeout ou Payload Too Large
-    const formData = new FormData()
-    formData.append('file', file, cleanFileName)
-    formData.append('fileName', cleanFileName)
-    formData.append('mimeType', file.type)
+    // Converter arquivo para base64 para envio como JSON (mais estável para Edge Functions CORS)
+    const buffer = await file.arrayBuffer()
+    let binary = ''
+    const bytes = new Uint8Array(buffer)
+    const len = bytes.byteLength
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i])
+    }
+    const base64Data = btoa(binary)
+
+    const payload = {
+      fileData: base64Data,
+      fileName: cleanFileName,
+      mimeType: file.type || 'application/pdf',
+    }
 
     const { data, error } = await supabase.functions.invoke('analyze-quote', {
-      body: formData,
+      body: payload,
     })
 
     if (error) {
