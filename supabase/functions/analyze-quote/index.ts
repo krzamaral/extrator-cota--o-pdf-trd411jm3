@@ -54,13 +54,13 @@ Deno.serve(async (req: Request) => {
       fileBuffer = Buffer.from(fileData, 'base64')
     }
 
-    const apiKey = Deno.env.get('openaikey')
+    const openAiKey = Deno.env.get('openaikey')
 
-    if (!apiKey) {
+    if (!openAiKey) {
       throw new Error('A chave da API da OpenAI não está configurada nos secrets do Supabase.')
     }
 
-    const openai = new OpenAI({ apiKey })
+    const openai = new OpenAI({ apiKey: openAiKey })
     let textContent = ''
 
     if (mimeType === 'application/pdf') {
