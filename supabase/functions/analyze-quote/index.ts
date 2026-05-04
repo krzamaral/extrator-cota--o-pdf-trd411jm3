@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-import OpenAI from 'npm:openai'
-import pdf from 'npm:pdf-parse'
+import OpenAI from 'npm:openai@4.67.3'
+import pdf from 'npm:pdf-parse@1.1.1'
 import { Buffer } from 'node:buffer'
 
 const corsHeaders = {
