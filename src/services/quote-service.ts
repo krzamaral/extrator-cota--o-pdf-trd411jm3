@@ -99,19 +99,10 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
         }
       }
 
-      if (serverErrorMsg?.includes('A chave da API da OpenAI não está configurada')) {
-        console.warn('OpenAI API key missing, returning mock data.')
-        return generateMockQuote()
-      }
-
       throw new Error(serverErrorMsg || 'Falha de comunicação com o servidor ao analisar o PDF.')
     }
 
     if (data && data.error) {
-      if (data.error.includes('A chave da API da OpenAI não está configurada')) {
-        console.warn('OpenAI API key missing, returning mock data.')
-        return generateMockQuote()
-      }
       throw new Error(data.error)
     }
 
@@ -125,27 +116,6 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
     throw new Error(err.message || 'Erro inesperado durante a extração dos dados.')
   }
 }
-
-const generateMockQuote = (): QuoteData => ({
-  quoteNumber: `COT-MOCK-${Math.floor(Math.random() * 10000)}`,
-  modal: 'Aéreo',
-  agent: 'Fast Logistics Ltd',
-  origin: 'Shanghai (PVG)',
-  destination: 'Guarulhos (GRU)',
-  incoterm: 'EXW',
-  etd: new Date().toISOString().split('T')[0],
-  eta: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-  freeTime: 7,
-  weight: 1250.5,
-  currency: 'USD',
-  tariffs: [
-    { name: 'Air Freight', value: 4500, currency: 'USD' },
-    { name: 'Fuel Surcharge', value: 350, currency: 'USD' },
-    { name: 'Security Surcharge', value: 150, currency: 'USD' },
-    { name: 'Handling', value: 80, currency: 'USD' },
-  ],
-  status: 'rascunho',
-})
 
 export const saveQuoteToDb = async (quoteData: QuoteData & { status?: string }) => {
   const {
