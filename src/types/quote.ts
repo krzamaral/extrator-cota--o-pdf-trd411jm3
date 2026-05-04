@@ -4,10 +4,14 @@ export interface TariffComponent {
 }
 
 export interface QuoteData {
+  quoteNumber?: string
   modal: string
   agent: string
+  origin?: string
+  destination?: string
+  incoterm?: string
   tariffs: TariffComponent[]
-  weight: string
+  weight: number
   etd: string
   eta: string
   freeTime: number

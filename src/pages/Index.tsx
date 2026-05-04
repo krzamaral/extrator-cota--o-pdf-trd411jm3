@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { UploadArea } from '@/components/UploadArea'
 import { QuoteResultCard } from '@/components/QuoteResultCard'
 import { QuoteSkeleton } from '@/components/QuoteSkeleton'
@@ -65,10 +66,10 @@ export default function Index() {
     })
   }
 
-  const handleReview = (id: string) => {
-    toast.success('Pronto para revisão!', {
-      description: 'Esta ação levaria para a página de conferência detalhada.',
-    })
+  const navigate = useNavigate()
+
+  const handleReview = (id: string, data: QuoteData) => {
+    navigate(`/review/${id}`, { state: { quote: data } })
   }
 
   return (
@@ -122,7 +123,7 @@ export default function Index() {
                   <QuoteResultCard
                     fileName={file.file.name}
                     data={file.data}
-                    onReview={() => handleReview(file.id)}
+                    onReview={() => handleReview(file.id, file.data!)}
                     onDiscard={() => handleDiscard(file.id)}
                   />
                 )}

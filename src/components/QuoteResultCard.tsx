@@ -95,7 +95,7 @@ export function QuoteResultCard({ fileName, data, onReview, onDiscard }: QuoteRe
                 <Package className="w-4 h-4" />
                 <span>Peso/Vol</span>
               </div>
-              <p className="font-medium">{data.weight || '--'}</p>
+              <p className="font-medium">{data.weight ? `${data.weight} kg` : '--'}</p>
             </div>
           </div>
         </div>
