@@ -1,6 +1,7 @@
 export interface TariffComponent {
   name: string
   value: number
+  currency: string
 }
 
 export interface QuoteData {

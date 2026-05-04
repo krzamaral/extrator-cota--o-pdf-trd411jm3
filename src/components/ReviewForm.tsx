@@ -1,9 +1,7 @@
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { useState, useEffect } from 'react'
 import { QuoteData } from '@/types/quote'
-import { getExchangeRate } from '@/services/currency'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -29,6 +27,7 @@ import { cn } from '@/lib/utils'
 const tariffSchema = z.object({
   name: z.string().min(1, 'Nome obrigatório'),
   value: z.coerce.number().min(0, 'Valor inválido'),
+  currency: z.string().min(1, 'Moeda obrigatória'),
 })
 
 const reviewSchema = z
@@ -64,6 +63,8 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
+  const defaultCurrency = initialData.currency || 'USD'
+
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
     defaultValues: {
@@ -76,9 +77,12 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
       etd: initialData.etd || '',
       eta: initialData.eta || '',
       freeTime: initialData.freeTime || 0,
-      tariffs: initialData.tariffs || [],
+      tariffs: (initialData.tariffs || []).map((t) => ({
+        ...t,
+        currency: t.currency || defaultCurrency,
+      })),
       weight: initialData.weight || 0,
-      currency: initialData.currency || 'USD',
+      currency: defaultCurrency,
     },
     mode: 'onChange',
   })
@@ -88,24 +92,23 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
     name: 'tariffs',
   })
 
-  const [exchangeRate, setExchangeRate] = useState(1)
-
   const modal = form.watch('modal')
   const currency = form.watch('currency')
   const etd = form.watch('etd')
   const freeTime = form.watch('freeTime')
   const tariffs = form.watch('tariffs')
 
-  useEffect(() => {
-    if (currency && currency !== 'BRL') {
-      getExchangeRate(currency).then(setExchangeRate)
-    } else {
-      setExchangeRate(1)
-    }
-  }, [currency])
+  const totalsByCurrency = tariffs.reduce(
+    (acc, t) => {
+      const curr = t.currency || 'USD'
+      if (!acc[curr]) acc[curr] = 0
+      acc[curr] += Number(t.value) || 0
+      return acc
+    },
+    {} as Record<string, number>,
+  )
 
-  const total = tariffs.reduce((sum, t) => sum + (Number(t.value) || 0), 0)
-  const totalBRL = total * exchangeRate
+  const totalsEntries = Object.entries(totalsByCurrency)
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -371,7 +374,7 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Moeda Original <span className="text-red-500">*</span>
+                    Moeda Padrão <span className="text-red-500">*</span>
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
@@ -402,7 +405,7 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => append({ name: '', value: 0 })}
+              onClick={() => append({ name: '', value: 0, currency: currency || 'USD' })}
               className="text-primary border-primary/20 hover:bg-primary/5"
             >
               <Plus className="w-4 h-4 mr-1" /> Adicionar
@@ -432,24 +435,36 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
                         </FormItem>
                       )}
                     />
-                    <div className="flex w-full sm:w-auto gap-4 items-start">
+                    <div className="flex w-full sm:w-auto gap-3 items-start">
+                      <FormField
+                        control={form.control}
+                        name={`tariffs.${index}.currency`}
+                        render={({ field }) => (
+                          <FormItem className="w-24 shrink-0">
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="USD">USD</SelectItem>
+                                <SelectItem value="EUR">EUR</SelectItem>
+                                <SelectItem value="BRL">BRL</SelectItem>
+                                <SelectItem value="GBP">GBP</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <FormField
                         control={form.control}
                         name={`tariffs.${index}.value`}
                         render={({ field }) => (
-                          <FormItem className="flex-1 sm:w-48">
+                          <FormItem className="flex-1 sm:w-32">
                             <FormControl>
-                              <div className="relative">
-                                <span className="absolute left-3 top-2.5 text-gray-500 text-sm font-medium">
-                                  {currency}
-                                </span>
-                                <Input
-                                  type="number"
-                                  step="0.01"
-                                  className="pl-12 font-medium"
-                                  {...field}
-                                />
-                              </div>
+                              <Input type="number" step="0.01" className="font-medium" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -470,34 +485,28 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
               </div>
             )}
 
-            <div className="mt-8 bg-primary/5 border border-primary/10 rounded-lg p-5 flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="mt-8 bg-primary/5 border border-primary/10 rounded-lg p-5">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 bg-white shadow-sm border border-primary/10 rounded-full">
                   <Calculator className="w-5 h-5 text-primary" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Valor Total Estimado</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {formatCurrency(total, currency)}
-                  </p>
-                </div>
+                <h3 className="text-sm font-medium text-gray-600">Total por Moeda</h3>
               </div>
-
-              {currency !== 'BRL' && (
-                <div className="flex items-center gap-4 md:border-l md:border-primary/20 md:pl-6 w-full md:w-auto pt-4 md:pt-0 border-t border-primary/10 md:border-t-0">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 flex items-center gap-1">
-                      Valor em BRL
-                      <span className="text-xs font-normal text-gray-400">
-                        (Taxa: {exchangeRate.toFixed(4)})
-                      </span>
-                    </p>
-                    <p className="text-xl font-bold text-primary">
-                      {formatCurrency(totalBRL, 'BRL')}
-                    </p>
-                  </div>
-                </div>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {totalsEntries.length === 0 ? (
+                  <p className="text-gray-500 text-sm">Nenhum valor adicionado</p>
+                ) : (
+                  totalsEntries.map(([curr, val]) => (
+                    <div
+                      key={curr}
+                      className="bg-white p-4 rounded-md border border-gray-100 shadow-sm"
+                    >
+                      <p className="text-xs text-gray-500 font-medium mb-1">{curr}</p>
+                      <p className="text-xl font-bold text-gray-900">{formatCurrency(val, curr)}</p>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

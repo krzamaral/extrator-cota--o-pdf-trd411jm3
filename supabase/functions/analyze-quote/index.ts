@@ -43,7 +43,7 @@ Deno.serve(async (req: Request) => {
           content: [
             {
               type: 'text',
-              text: 'Analise este PDF de cotação de frete. Extraia: modal, agente, componentes tarifários, peso, datas, free time, moeda e valor total. Retorne em JSON estruturado usando o seguinte schema: { modal: string, agent: string, tariffs: [{name: string, value: number}], weight: string, etd: string, eta: string, freeTime: number, currency: string, total: number }',
+              text: 'Analise este PDF de cotação de frete. Extraia: modal, agente, componentes tarifários com suas respectivas moedas, peso, datas, free time e moeda principal. Retorne em JSON estruturado usando o seguinte schema: { modal: string, agent: string, tariffs: [{name: string, value: number, currency: string}], weight: number, etd: string, eta: string, freeTime: number, currency: string }',
             },
             {
               type: 'image_url',
