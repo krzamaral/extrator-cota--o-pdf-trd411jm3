@@ -54,7 +54,7 @@ Deno.serve(async (req: Request) => {
       fileBuffer = Buffer.from(fileData, 'base64')
     }
 
-    const apiKey = Deno.env.get('OPENAI_API_KEY')
+    const apiKey = Deno.env.get('openaikey')
 
     if (!apiKey) {
       throw new Error('A chave da API da OpenAI não está configurada nos secrets do Supabase.')
