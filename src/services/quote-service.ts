@@ -102,10 +102,19 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
         }
       }
 
+      if (serverErrorMsg?.includes('A chave da API da OpenAI não está configurada')) {
+        console.warn('OpenAI API key missing, returning mock data.')
+        return generateMockQuote()
+      }
+
       throw new Error(serverErrorMsg || 'Falha de comunicação com o servidor ao analisar o PDF.')
     }
 
     if (data && data.error) {
+      if (data.error.includes('A chave da API da OpenAI não está configurada')) {
+        console.warn('OpenAI API key missing, returning mock data.')
+        return generateMockQuote()
+      }
       throw new Error(data.error)
     }
 
