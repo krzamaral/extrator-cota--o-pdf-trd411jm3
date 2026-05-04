@@ -57,33 +57,54 @@ const sanitizeQuoteData = (quote: any): QuoteData => {
 export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Promise<QuoteData> => {
   try {
     const base64String = await fileToBase64(file)
+    const fileData = base64String.split(',')[1]
+
+    if (!fileData) {
+      throw new Error('Falha ao ler o conteúdo do arquivo PDF localmente.')
+    }
 
     const { data, error } = await supabase.functions.invoke('analyze-quote', {
       body: {
         fileName: file.name,
-        fileData: base64String.split(',')[1],
+        fileData,
         mimeType: file.type,
       },
     })
 
     if (error) {
+      console.error('Supabase invoke error:', error)
       if (error.message?.includes('429') && attempt < MAX_RETRIES) {
         console.warn(`Rate limit hit. Retrying in ${RETRY_DELAYS[attempt]}ms...`)
         await delay(RETRY_DELAYS[attempt])
         return extractQuoteFromPdf(file, attempt + 1)
       }
-      throw new Error(error.message || 'Falha de comunicação com a Edge Function.')
+
+      let serverErrorMsg = error.message
+
+      // Tentativa de extrair o payload JSON em caso de HTTP 400
+      if ((error as any).context && typeof (error as any).context.json === 'function') {
+        try {
+          const errBody = await (error as any).context.json()
+          if (errBody && errBody.error) {
+            serverErrorMsg = errBody.error
+          }
+        } catch (e) {
+          // ignorar
+        }
+      }
+
+      throw new Error(serverErrorMsg || 'Falha de comunicação com a Edge Function.')
     }
 
     if (data && data.error) {
-      throw new Error(`Erro na análise: ${data.error}`)
+      throw new Error(data.error)
     }
 
     if (data && data.quote) {
       return sanitizeQuoteData(data.quote) as QuoteData
     }
 
-    throw new Error('Falha ao processar cotação no servidor: resposta inválida.')
+    throw new Error('Falha ao processar cotação no servidor: formato de resposta inválido.')
   } catch (err: any) {
     console.error('Error extracting quote data:', err)
     throw new Error(err.message || 'Erro inesperado durante a extração dos dados.')

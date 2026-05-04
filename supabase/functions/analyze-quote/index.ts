@@ -16,30 +16,39 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { fileData, mimeType } = await req.json()
+    const bodyText = await req.text()
+    if (!bodyText) {
+      throw new Error('Corpo da requisição vazio.')
+    }
+
+    const body = JSON.parse(bodyText)
+    const fileData = body.fileData
+    const mimeType = body.mimeType
+    const fileName = body.fileName
 
     if (!fileData) {
-      throw new Error('No file data provided')
+      throw new Error('Nenhum dado de arquivo (fileData) fornecido.')
     }
 
     const apiKey = Deno.env.get('OPENAI_API_KEY')
 
     if (!apiKey) {
-      throw new Error('OPENAI_API_KEY is not configured in Edge Function secrets.')
+      throw new Error('A chave da API da OpenAI não está configurada nos secrets do Supabase.')
     }
 
     const openai = new OpenAI({ apiKey })
     let textContent = ''
 
-    // Se for PDF, tentamos extrair o texto diretamente usando pdf-parse
     if (mimeType === 'application/pdf') {
       try {
         const fileBuffer = Buffer.from(fileData, 'base64')
         const pdfData = await pdf(fileBuffer)
         textContent = pdfData.text
-      } catch (err) {
-        console.error('Erro no pdf-parse:', err)
-        // Continua sem textContent, tentaremos usar a imagem como fallback
+      } catch (err: any) {
+        console.error('Erro no pdf-parse:', err.message || err)
+        throw new Error(
+          'Falha ao extrair texto do PDF. O arquivo pode estar corrompido ou protegido.',
+        )
       }
     }
 
@@ -72,28 +81,32 @@ Schema esperado:
 
     const messages: any[] = [{ role: 'system', content: systemPrompt }]
 
-    // Se o PDF foi lido como texto com sucesso e possui conteúdo considerável
     if (textContent && textContent.trim().length > 50) {
       messages.push({
         role: 'user',
-        content: `Extraia os dados da seguinte cotação:\n\n${textContent.substring(0, 15000)}`,
+        content: `Nome do Arquivo Original: ${fileName || 'Desconhecido'}\n\nExtraia os dados da seguinte cotação:\n\n${textContent.substring(0, 15000)}`,
       })
     } else {
-      // Fallback para envio como imagem (caso seja uma imagem base64 ou fallback do pdf-parse)
-      messages.push({
-        role: 'user',
-        content: [
-          { type: 'text', text: 'Extraia os dados desta imagem de cotação de frete:' },
-          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${fileData}` } },
-        ],
-      })
+      if (mimeType === 'application/pdf') {
+        throw new Error(
+          'O PDF enviado não contém texto legível (parece ser uma imagem escaneada). Por favor, envie um PDF com texto pesquisável.',
+        )
+      } else {
+        messages.push({
+          role: 'user',
+          content: [
+            { type: 'text', text: 'Extraia os dados desta imagem de cotação de frete:' },
+            { type: 'image_url', image_url: { url: `data:${mimeType};base64,${fileData}` } },
+          ],
+        })
+      }
     }
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages,
       response_format: { type: 'json_object' },
-      temperature: 0.1, // temperatura baixa para extração de dados estrita
+      temperature: 0.1,
     })
 
     const content = response.choices[0].message.content
@@ -104,6 +117,7 @@ Schema esperado:
         quote = JSON.parse(content)
       } catch (e) {
         console.error('Failed to parse OpenAI JSON response', e)
+        throw new Error('A inteligência artificial retornou um formato de dados inválido.')
       }
     }
 
@@ -114,9 +128,14 @@ Schema esperado:
     console.error('Edge Function Error:', error)
     const isRateLimit = error.status === 429 || error.message?.includes('429')
 
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      status: isRateLimit ? 429 : 400,
-    })
+    // Retorna 200 para erros de processamento para evitar o log intrusivo de erro 400 do Supabase Client
+    // Retorna 429 para rate limits
+    return new Response(
+      JSON.stringify({ error: error.message || 'Erro interno no processamento.' }),
+      {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        status: isRateLimit ? 429 : 200,
+      },
+    )
   }
 })
