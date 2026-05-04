@@ -103,7 +103,20 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
     (acc, t) => {
       const curr = t.currency || 'USD'
       if (!acc[curr]) acc[curr] = 0
-      acc[curr] += Number(t.value) || 0
+
+      let val = t.value
+      if (typeof val === 'string') {
+        const strVal = String(val).replace(/[^\d.,-]/g, '')
+        const dotIndex = strVal.lastIndexOf('.')
+        const commaIndex = strVal.lastIndexOf(',')
+        if (commaIndex > dotIndex) {
+          val = Number(strVal.replace(/\./g, '').replace(',', '.'))
+        } else {
+          val = Number(strVal.replace(/,/g, ''))
+        }
+      }
+
+      acc[curr] += Number(val) || 0
       return acc
     },
     {} as Record<string, number>,
