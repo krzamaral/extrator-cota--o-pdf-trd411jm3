@@ -71,7 +71,7 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
     })
 
     if (error) {
-      console.error('Supabase invoke error:', error)
+      console.warn('Supabase invoke error:', error)
 
       const isNetworkOrTimeout =
         error.message === 'Failed to send a request to the Edge Function' ||
@@ -122,7 +122,7 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
 
     throw new Error('Falha ao processar cotação no servidor: formato de resposta inválido.')
   } catch (err: any) {
-    console.error('Error extracting quote data:', err)
+    console.warn('Error extracting quote data:', err.message || err)
     throw new Error(err.message || 'Erro inesperado durante a extração dos dados.')
   }
 }
