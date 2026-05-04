@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import logoImg from '@/assets/logo-preto-6e192.png'
+import logoImg from '@/assets/logo-brasporto-colorido-e159c.png'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -52,10 +52,14 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <Card className="w-full max-w-md shadow-lg border-gray-100">
         <CardHeader className="text-center space-y-2 pb-6">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <img src={logoImg} alt="Brasporto Logo" className="h-12 w-auto object-contain" />
-            <span className="font-bold text-[#003366] text-2xl tracking-tight">
-              Brasporto Logística
+          <div className="flex flex-col items-center justify-center gap-4 mb-6">
+            <img src={logoImg} alt="Brasporto Logo" className="h-20 w-auto object-contain" />
+            <span className="font-bold text-2xl tracking-wider uppercase text-center">
+              <span className="text-[#818285]">BRAS</span>
+              <span className="text-[#3A879E]">PORTO</span>
+              <span className="block text-[#818285] font-medium text-sm tracking-[0.2em] mt-1">
+                LOGÍSTICA
+              </span>
             </span>
           </div>
           <CardTitle className="text-xl font-medium font-heading text-gray-500">
@@ -89,7 +93,7 @@ export default function Login() {
             </div>
             <Button
               type="submit"
-              className="w-full h-12 text-md font-medium bg-[#003366] hover:bg-[#003366]/90"
+              className="w-full h-12 text-md font-medium bg-[#3A879E] hover:bg-[#3A879E]/90 text-white"
               disabled={loading}
             >
               {loading ? 'Aguarde...' : 'Entrar'}
