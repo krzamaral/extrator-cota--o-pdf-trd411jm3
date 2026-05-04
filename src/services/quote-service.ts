@@ -15,6 +15,45 @@ const fileToBase64 = (file: File): Promise<string> => {
   })
 }
 
+const parseNumber = (val: any): number => {
+  if (typeof val === 'number') return val
+  if (typeof val === 'string') {
+    // Remove tudo que não for dígito, ponto, vírgula ou sinal de menos
+    const clean = val.replace(/[^\d.,-]/g, '')
+    // Se tiver ambos vírgula e ponto (ex: 1.500,50 ou 1,500.50)
+    if (clean.includes(',') && clean.includes('.')) {
+      if (clean.indexOf(',') > clean.indexOf('.')) {
+        // Formato BR (1.500,50) -> remove ponto, substitui vírgula
+        return parseFloat(clean.replace(/\./g, '').replace(',', '.'))
+      } else {
+        // Formato US (1,500.50) -> remove vírgula
+        return parseFloat(clean.replace(/,/g, ''))
+      }
+    }
+    // Se tiver apenas vírgula (ex: 1500,50)
+    if (clean.includes(',')) {
+      return parseFloat(clean.replace(',', '.'))
+    }
+    const parsed = parseFloat(clean)
+    return isNaN(parsed) ? 0 : parsed
+  }
+  return 0
+}
+
+const sanitizeQuoteData = (quote: any): QuoteData => {
+  return {
+    ...quote,
+    weight: parseNumber(quote.weight),
+    freeTime: parseNumber(quote.freeTime),
+    tariffs: Array.isArray(quote.tariffs)
+      ? quote.tariffs.map((t: any) => ({
+          ...t,
+          value: parseNumber(t.value),
+        }))
+      : [],
+  }
+}
+
 export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Promise<QuoteData> => {
   try {
     const base64String = await fileToBase64(file)
@@ -33,24 +72,21 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
         await delay(RETRY_DELAYS[attempt])
         return extractQuoteFromPdf(file, attempt + 1)
       }
-      console.warn('Edge function returned error, using mock fallback', error)
-      return generateMockQuote()
-    }
-
-    if (data && data.quote) {
-      return data.quote as QuoteData
+      throw new Error(error.message || 'Falha de comunicação com a Edge Function.')
     }
 
     if (data && data.error) {
-      console.warn('Edge function data returned error, using mock fallback', data.error)
-      return generateMockQuote()
+      throw new Error(`Erro na análise: ${data.error}`)
     }
 
-    throw new Error('Falha ao processar cotação no servidor.')
+    if (data && data.quote) {
+      return sanitizeQuoteData(data.quote) as QuoteData
+    }
+
+    throw new Error('Falha ao processar cotação no servidor: resposta inválida.')
   } catch (err: any) {
     console.error('Error extracting quote data:', err)
-    console.warn('Falling back to mock data due to exception')
-    return generateMockQuote()
+    throw new Error(err.message || 'Erro inesperado durante a extração dos dados.')
   }
 }
 
