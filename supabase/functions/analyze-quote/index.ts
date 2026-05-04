@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { corsHeaders } from '../_shared/cors.ts'
-import OpenAI from 'openai'
+import OpenAI from 'npm:openai'
 
 // This is a stub for the OpenAI integration as requested.
 // It accepts a base64 encoded file and attempts to use the Vision API.
