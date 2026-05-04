@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase/client'
 import { QuoteData } from '@/types/quote'
-import { mockQuoteData } from './mock-data'
 
 const MAX_RETRIES = 3
 const RETRY_DELAYS = [2000, 4000, 8000] // 2s, 4s, 8s for 429 errors
@@ -46,15 +45,53 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
       return data.quote as QuoteData
     }
 
-    // Fallback to mock data if the Edge Function returns empty but no error
-    // This satisfies "Mantenha os dados mockados até conectar OpenAI"
-    return mockQuoteData
-  } catch (err) {
+    throw new Error('Falha ao processar cotação no servidor.')
+  } catch (err: any) {
     console.error('Error extracting quote data:', err)
-    // If the edge function fails (e.g., no API key configured yet), gracefully fallback to mock data
-    // to keep the frontend functional during development.
-    console.log('Falling back to mock data due to API error.')
-    await delay(1000) // simulate a bit more work before returning mock
-    return mockQuoteData
+    throw err
   }
+}
+
+export const saveQuoteToDb = async (quoteData: QuoteData) => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session?.user) throw new Error('Usuário não autenticado')
+
+  const { data: quote, error: quoteError } = await supabase
+    .from('quotes')
+    .insert({
+      quote_number: quoteData.quoteNumber,
+      modal: quoteData.modal,
+      agent_name: quoteData.agent,
+      origin: quoteData.origin,
+      destination: quoteData.destination,
+      incoterm: quoteData.incoterm,
+      etd: quoteData.etd,
+      eta: quoteData.eta || null,
+      free_time: quoteData.freeTime,
+      weight: quoteData.weight,
+      currency: quoteData.currency,
+      user_id: session.user.id,
+    })
+    .select()
+    .single()
+
+  if (quoteError) throw quoteError
+
+  if (quoteData.tariffs && quoteData.tariffs.length > 0) {
+    const tariffsToInsert = quoteData.tariffs.map((t) => ({
+      quote_id: quote.id,
+      name: t.name,
+      value: t.value,
+      currency: t.currency,
+    }))
+
+    const { error: tariffsError } = await supabase.from('quote_tariffs').insert(tariffsToInsert)
+
+    if (tariffsError) throw tariffsError
+  }
+
+  return quote
 }

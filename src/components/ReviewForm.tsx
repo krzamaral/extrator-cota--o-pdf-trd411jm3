@@ -1,5 +1,6 @@
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { saveQuoteToDb } from '@/services/quote-service'
 import * as z from 'zod'
 import { QuoteData } from '@/types/quote'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -115,11 +116,18 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
   const isEtdPast = etd ? new Date(etd) < today : false
   const isFreeTimeShort = freeTime < 7
 
-  const onSubmit = (data: ReviewFormValues) => {
-    toast.success('Cotação salva com sucesso', {
-      description: 'Os dados foram validados e gravados.',
-    })
-    setTimeout(onBack, 1500)
+  const onSubmit = async (data: ReviewFormValues) => {
+    try {
+      await saveQuoteToDb(data as any)
+      toast.success('Cotação salva com sucesso', {
+        description: 'Os dados foram validados e gravados no banco de dados.',
+      })
+      setTimeout(onBack, 1500)
+    } catch (error: any) {
+      toast.error('Erro ao salvar cotação', {
+        description: error.message || 'Ocorreu um erro inesperado.',
+      })
+    }
   }
 
   const handleDiscard = () => {
@@ -531,10 +539,10 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
               <Button
                 type="submit"
                 className="w-full sm:w-auto bg-primary hover:bg-primary/90 min-w-[160px]"
-                disabled={!form.formState.isValid}
+                disabled={!form.formState.isValid || form.formState.isSubmitting}
               >
                 <Save className="w-4 h-4 mr-2" />
-                Salvar e Avançar
+                {form.formState.isSubmitting ? 'Salvando...' : 'Salvar e Avançar'}
               </Button>
               {!form.formState.isValid && (
                 <span className="text-[11px] text-red-500 mt-1.5 font-medium bg-red-50 px-2 py-0.5 rounded border border-red-100">

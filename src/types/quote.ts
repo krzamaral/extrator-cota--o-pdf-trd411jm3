@@ -14,7 +14,7 @@ export interface QuoteData {
   tariffs: TariffComponent[]
   weight: number
   etd: string
-  eta: string
+  eta?: string
   freeTime: number
   currency: string
   total: number

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { QuoteData } from '@/types/quote'
-import { mockQuoteData } from '@/services/mock-data'
 import { ReviewForm } from '@/components/ReviewForm'
 import { ChevronRight, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,12 +19,9 @@ export default function Review() {
       const stateData = location.state?.quote
       if (stateData) {
         setData(stateData)
-      } else {
-        // Fallback to mock data if accessed directly without state
-        setData(mockQuoteData)
       }
       setLoading(false)
-    }, 800)
+    }, 500)
     return () => clearTimeout(timer)
   }, [location.state])
 
@@ -65,9 +61,9 @@ export default function Review() {
       ) : !data ? (
         <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
           <h3 className="text-lg font-medium text-gray-900">Nenhuma cotação para revisar</h3>
-          <p className="text-gray-500 mt-1">Os dados não puderam ser carregados.</p>
-          <Button onClick={handleBack} className="mt-4">
-            Voltar
+          <p className="text-gray-500 mt-1">Os dados não puderam ser carregados ou não existem.</p>
+          <Button onClick={() => navigate('/')} className="mt-4">
+            Voltar para Cotações
           </Button>
         </div>
       ) : (
