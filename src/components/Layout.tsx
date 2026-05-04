@@ -2,7 +2,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
-import logoImg from '@/assets/logo-color-fe957.png'
+import logoImg from '@/assets/logo-preto-6e192.png'
 
 export default function Layout() {
   const { user, signOut } = useAuth()
@@ -17,8 +17,11 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col bg-slate-50">
       <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-md shadow-sm">
+          <div className="flex items-center gap-3 bg-white px-3 py-1.5 rounded-md shadow-sm">
             <img src={logoImg} alt="Brasporto Logo" className="h-8 w-auto object-contain" />
+            <span className="font-bold text-[#003366] text-lg hidden sm:inline-block">
+              Brasporto Logística
+            </span>
           </div>
           <div className="flex items-center gap-4 text-sm font-medium opacity-90">
             <span className="hidden md:inline-block text-xs bg-white/20 px-2 py-1 rounded-md">

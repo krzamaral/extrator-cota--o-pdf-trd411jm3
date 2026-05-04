@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import logoImg from '@/assets/logo-color-fe957.png'
+import logoImg from '@/assets/logo-preto-6e192.png'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -52,10 +52,13 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <Card className="w-full max-w-md shadow-lg border-gray-100">
         <CardHeader className="text-center space-y-2 pb-6">
-          <div className="flex justify-center mb-6">
-            <img src={logoImg} alt="Brasporto Logo" className="h-16 w-auto object-contain" />
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <img src={logoImg} alt="Brasporto Logo" className="h-12 w-auto object-contain" />
+            <span className="font-bold text-[#003366] text-2xl tracking-tight">
+              Brasporto Logística
+            </span>
           </div>
-          <CardTitle className="text-2xl font-bold font-heading text-[#003366]">
+          <CardTitle className="text-xl font-medium font-heading text-gray-500">
             Portal Brasporto
           </CardTitle>
           <CardDescription>Acesse a plataforma de gestão de cotações</CardDescription>
