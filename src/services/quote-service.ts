@@ -63,9 +63,12 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
       throw new Error('Falha ao ler o conteúdo do arquivo PDF localmente.')
     }
 
+    // Limpar o nome do arquivo para evitar conflitos com caracteres especiais no backend
+    const cleanFileName = file.name.replace(/[^\w\s.-]/gi, '').trim() || 'arquivo_desconhecido.pdf'
+
     const { data, error } = await supabase.functions.invoke('analyze-quote', {
       body: {
-        fileName: file.name,
+        fileName: cleanFileName,
         fileData,
         mimeType: file.type,
       },
@@ -81,7 +84,13 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
 
       let serverErrorMsg = error.message
 
-      // Tentativa de extrair o payload JSON em caso de HTTP 400
+      // Melhoria no feedback de erro para retornos HTTP de falha (ex: 400 Bad Request)
+      if (error.message?.includes('HTTP 400')) {
+        serverErrorMsg =
+          'O servidor rejeitou o arquivo. O PDF pode estar corrompido, protegido por senha, ou em um formato não suportado.'
+      }
+
+      // Tentativa de extrair o payload JSON detalhado enviado pela Edge Function
       if ((error as any).context && typeof (error as any).context.json === 'function') {
         try {
           const errBody = await (error as any).context.json()
@@ -93,7 +102,7 @@ export const extractQuoteFromPdf = async (file: File, attempt: number = 0): Prom
         }
       }
 
-      throw new Error(serverErrorMsg || 'Falha de comunicação com a Edge Function.')
+      throw new Error(serverErrorMsg || 'Falha de comunicação com o servidor ao analisar o PDF.')
     }
 
     if (data && data.error) {

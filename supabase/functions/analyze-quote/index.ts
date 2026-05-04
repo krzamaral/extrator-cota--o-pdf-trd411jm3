@@ -42,12 +42,41 @@ Deno.serve(async (req: Request) => {
     if (mimeType === 'application/pdf') {
       try {
         const fileBuffer = Buffer.from(fileData, 'base64')
-        const pdfData = await pdf(fileBuffer)
-        textContent = pdfData.text
+
+        // Tolerância a variações de estrutura e metadados atípicos
+        const pdfData = await pdf(fileBuffer, {
+          max: 0,
+          pagerender: function (pageData: any) {
+            return pageData
+              .getTextContent({
+                normalizeWhitespace: true,
+                disableCombineTextItems: false,
+              })
+              .then(function (textContent: any) {
+                let lastY,
+                  text = ''
+                for (const item of textContent.items) {
+                  if (lastY == item.transform[5] || !lastY) {
+                    text += item.str
+                  } else {
+                    text += '\n' + item.str
+                  }
+                  lastY = item.transform[5]
+                }
+                return text
+              })
+              .catch((err: any) => {
+                console.warn('Aviso: falha ao extrair texto de uma página', err)
+                return '' // Ignora a página defeituosa e continua
+              })
+          },
+        })
+
+        textContent = pdfData.text || ''
       } catch (err: any) {
         console.error('Erro no pdf-parse:', err.message || err)
         throw new Error(
-          'Falha ao extrair texto do PDF. O arquivo pode estar corrompido ou protegido.',
+          'Falha ao extrair texto do PDF. A estrutura do arquivo é inválida ou o PDF está protegido.',
         )
       }
     }
@@ -128,13 +157,18 @@ Schema esperado:
     console.error('Edge Function Error:', error)
     const isRateLimit = error.status === 429 || error.message?.includes('429')
 
-    // Retorna 200 para erros de processamento para evitar o log intrusivo de erro 400 do Supabase Client
-    // Retorna 429 para rate limits
+    // Retornar 400 para erros de formato/validação para o frontend identificar a rejeição
+    const isBadRequest =
+      error.message?.includes('vazio') ||
+      error.message?.includes('inválid') ||
+      error.message?.includes('corrompido') ||
+      error.message?.includes('protegido')
+
     return new Response(
       JSON.stringify({ error: error.message || 'Erro interno no processamento.' }),
       {
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        status: isRateLimit ? 429 : 200,
+        status: isRateLimit ? 429 : isBadRequest ? 400 : 200,
       },
     )
   }
