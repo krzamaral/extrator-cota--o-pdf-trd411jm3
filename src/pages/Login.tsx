@@ -3,9 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Package2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import logoImg from '@/assets/logo-color-fe957.png'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -52,10 +52,8 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <Card className="w-full max-w-md shadow-lg border-gray-100">
         <CardHeader className="text-center space-y-2 pb-6">
-          <div className="flex justify-center mb-4">
-            <div className="bg-primary p-3 rounded-xl text-primary-foreground shadow-sm">
-              <Package2 className="w-8 h-8" />
-            </div>
+          <div className="flex justify-center mb-6">
+            <img src={logoImg} alt="Brasporto Logo" className="h-16 w-auto object-contain" />
           </div>
           <CardTitle className="text-2xl font-bold font-heading text-[#003366]">
             Portal Brasporto

@@ -1,7 +1,8 @@
 import { Outlet, useNavigate } from 'react-router-dom'
-import { Package2, LogOut } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
+import logoImg from '@/assets/logo-color-fe957.png'
 
 export default function Layout() {
   const { user, signOut } = useAuth()
@@ -16,19 +17,8 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col bg-slate-50">
       <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* Logo placeholder icon aligned with Brasporto brand */}
-            <div className="bg-white p-1.5 rounded-md text-primary">
-              <Package2 className="w-6 h-6" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-heading font-bold text-xl leading-none tracking-tight">
-                BRASPORTO
-              </span>
-              <span className="text-[10px] tracking-widest uppercase opacity-80 mt-0.5">
-                International Logistics
-              </span>
-            </div>
+          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-md shadow-sm">
+            <img src={logoImg} alt="Brasporto Logo" className="h-8 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-4 text-sm font-medium opacity-90">
             <span className="hidden md:inline-block text-xs bg-white/20 px-2 py-1 rounded-md">
