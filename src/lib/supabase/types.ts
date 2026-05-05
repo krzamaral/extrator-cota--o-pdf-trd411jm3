@@ -1,11 +1,17 @@
 // AVOID UPDATING THIS FILE DIRECTLY. It is automatically generated.
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '14.5'
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -60,11 +66,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'cargo_quote_id_fkey'
-            columns: ['quote_id']
+            foreignKeyName: "cargo_quote_id_fkey"
+            columns: ["quote_id"]
             isOneToOne: false
-            referencedRelation: 'quotes'
-            referencedColumns: ['id']
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -119,18 +125,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'commercial_proposals_client_id_fkey'
-            columns: ['client_id']
+            foreignKeyName: "commercial_proposals_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: 'clients'
-            referencedColumns: ['id']
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'commercial_proposals_quote_id_fkey'
-            columns: ['quote_id']
+            foreignKeyName: "commercial_proposals_quote_id_fkey"
+            columns: ["quote_id"]
             isOneToOne: false
-            referencedRelation: 'quotes'
-            referencedColumns: ['id']
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -200,35 +206,85 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'cotacoes_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "cotacoes_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'usuarios'
-            referencedColumns: ['id']
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_processing_logs: {
+        Row: {
+          created_at: string | null
+          document_id: string | null
+          id: string
+          message: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          document_id?: string | null
+          id?: string
+          message?: string | null
+          status: string
+        }
+        Update: {
+          created_at?: string | null
+          document_id?: string | null
+          id?: string
+          message?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_processing_logs_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
           },
         ]
       }
       documents: {
         Row: {
           created_at: string
+          error_message: string | null
+          extracted_data: Json | null
+          file_type: string | null
           file_url: string
           id: string
-          reference_id: string
+          original_filename: string | null
+          processed_at: string | null
+          reference_id: string | null
           reference_type: string
+          status: string | null
         }
         Insert: {
           created_at?: string
+          error_message?: string | null
+          extracted_data?: Json | null
+          file_type?: string | null
           file_url: string
           id?: string
-          reference_id: string
+          original_filename?: string | null
+          processed_at?: string | null
+          reference_id?: string | null
           reference_type: string
+          status?: string | null
         }
         Update: {
           created_at?: string
+          error_message?: string | null
+          extracted_data?: Json | null
+          file_type?: string | null
           file_url?: string
           id?: string
-          reference_id?: string
+          original_filename?: string | null
+          processed_at?: string | null
+          reference_id?: string | null
           reference_type?: string
+          status?: string | null
         }
         Relationships: []
       }
@@ -280,11 +336,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'quote_tariffs_quote_id_fkey'
-            columns: ['quote_id']
+            foreignKeyName: "quote_tariffs_quote_id_fkey"
+            columns: ["quote_id"]
             isOneToOne: false
-            referencedRelation: 'quotes'
-            referencedColumns: ['id']
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -369,11 +425,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'routes_quote_id_fkey'
-            columns: ['quote_id']
+            foreignKeyName: "routes_quote_id_fkey"
+            columns: ["quote_id"]
             isOneToOne: false
-            referencedRelation: 'quotes'
-            referencedColumns: ['id']
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -416,11 +472,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'scoring_cotacao_id_fkey'
-            columns: ['cotacao_id']
+            foreignKeyName: "scoring_cotacao_id_fkey"
+            columns: ["cotacao_id"]
             isOneToOne: false
-            referencedRelation: 'cotacoes'
-            referencedColumns: ['id']
+            referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -507,7 +563,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_cotacao_from_extracted_data: {
+        Args: { p_document_id: string; p_extracted_data: Json }
+        Returns: string
+      }
+      create_quote_from_extracted_data: {
+        Args: { p_document_id: string; p_extracted_data: Json }
+        Returns: string
+      }
+      update_document_status: {
+        Args: {
+          p_document_id: string
+          p_error_message?: string
+          p_extracted_data?: Json
+          p_status: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
@@ -518,31 +590,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -551,23 +625,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -576,23 +650,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -601,36 +675,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
@@ -638,6 +712,7 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
 
 // ====== DATABASE EXTENDED CONTEXT (auto-generated) ======
 // This section contains actual PostgreSQL column types, constraints, RLS policies,
@@ -695,12 +770,24 @@ export const Constants = {
 //   status: text (nullable, default: 'rascunho'::text)
 //   created_at: timestamp with time zone (not null, default: now())
 //   updated_at: timestamp with time zone (not null, default: now())
+// Table: document_processing_logs
+//   id: uuid (not null, default: gen_random_uuid())
+//   document_id: uuid (nullable)
+//   status: text (not null)
+//   message: text (nullable)
+//   created_at: timestamp with time zone (nullable, default: now())
 // Table: documents
 //   id: uuid (not null, default: gen_random_uuid())
-//   reference_id: uuid (not null)
+//   reference_id: uuid (nullable)
 //   reference_type: text (not null)
 //   file_url: text (not null)
 //   created_at: timestamp with time zone (not null, default: now())
+//   status: text (nullable, default: 'pending'::text)
+//   file_type: text (nullable)
+//   original_filename: text (nullable)
+//   extracted_data: jsonb (nullable)
+//   error_message: text (nullable)
+//   processed_at: timestamp with time zone (nullable)
 // Table: profiles
 //   id: uuid (not null)
 //   email: text (not null)
@@ -786,6 +873,9 @@ export const Constants = {
 //   PRIMARY KEY cotacoes_pkey: PRIMARY KEY (id)
 //   CHECK cotacoes_status_check: CHECK ((status = ANY (ARRAY['rascunho'::text, 'conferido'::text, 'scoring'::text, 'finalizado'::text])))
 //   FOREIGN KEY cotacoes_user_id_fkey: FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE
+// Table: document_processing_logs
+//   FOREIGN KEY document_processing_logs_document_id_fkey: FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
+//   PRIMARY KEY document_processing_logs_pkey: PRIMARY KEY (id)
 // Table: documents
 //   PRIMARY KEY documents_pkey: PRIMARY KEY (id)
 // Table: profiles
@@ -870,6 +960,11 @@ export const Constants = {
 //   Policy "cotacoes_update" (UPDATE, PERMISSIVE) roles={authenticated}
 //     USING: (auth.uid() = user_id)
 //     WITH CHECK: (auth.uid() = user_id)
+// Table: document_processing_logs
+//   Policy "Permitir insert logs" (INSERT, PERMISSIVE) roles={authenticated}
+//     WITH CHECK: (EXISTS ( SELECT 1    FROM documents   WHERE (documents.id = document_processing_logs.document_id)))
+//   Policy "Permitir select logs" (SELECT, PERMISSIVE) roles={authenticated}
+//     USING: (EXISTS ( SELECT 1    FROM documents   WHERE (documents.id = document_processing_logs.document_id)))
 // Table: documents
 //   Policy "authenticated_delete" (DELETE, PERMISSIVE) roles={authenticated}
 //     USING: true
@@ -973,7 +1068,150 @@ export const Constants = {
 //     RETURN NEW;
 //   END;
 //   $function$
-//
+//   
+// FUNCTION create_cotacao_from_extracted_data(uuid, jsonb)
+//   CREATE OR REPLACE FUNCTION public.create_cotacao_from_extracted_data(p_document_id uuid, p_extracted_data jsonb)
+//    RETURNS uuid
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//   DECLARE
+//     v_cotacao_id UUID;
+//     v_user_id UUID;
+//   BEGIN
+//     -- Busca um usuário válido do sistema
+//     SELECT id INTO v_user_id FROM auth.users LIMIT 1;
+//   
+//     INSERT INTO public.cotacoes (
+//       user_id,
+//       numero_cotacao,
+//       modal,
+//       agente,
+//       origem,
+//       destino,
+//       incoterm,
+//       etd,
+//       eta,
+//       free_time,
+//       peso_volume,
+//       moeda_original,
+//       valor_total,
+//       componentes,
+//       valor_brl,
+//       status
+//     ) VALUES (
+//       v_user_id,
+//       COALESCE(p_extracted_data->>'quote_number', 'COT-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || SUBSTRING(p_document_id::TEXT, 1, 8)),
+//       COALESCE(p_extracted_data->>'modal', 'FCL'),
+//       COALESCE(p_extracted_data->>'agent_name', 'Agente não identificado'),
+//       COALESCE(p_extracted_data->>'origin', ''),
+//       COALESCE(p_extracted_data->>'destination', ''),
+//       COALESCE(p_extracted_data->>'incoterm', ''),
+//       COALESCE((p_extracted_data->>'etd')::DATE, CURRENT_DATE),
+//       (p_extracted_data->>'eta')::DATE,
+//       COALESCE((p_extracted_data->>'free_time')::INTEGER, 0),
+//       COALESCE((p_extracted_data->>'weight')::NUMERIC, 0),
+//       COALESCE(p_extracted_data->>'currency', 'USD'),
+//       COALESCE((p_extracted_data->>'total_value')::NUMERIC, 0),
+//       p_extracted_data,
+//       0,
+//       'rascunho'
+//     )
+//     RETURNING id INTO v_cotacao_id;
+//   
+//     UPDATE public.documents
+//     SET reference_id = v_cotacao_id,
+//         reference_type = 'cotacao'
+//     WHERE id = p_document_id;
+//   
+//     PERFORM public.update_document_status(p_document_id, 'completed', p_extracted_data);
+//   
+//     RETURN v_cotacao_id;
+//   EXCEPTION WHEN OTHERS THEN
+//     PERFORM public.update_document_status(p_document_id, 'error', NULL, SQLERRM);
+//     RAISE;
+//   END;
+//   $function$
+//   
+// FUNCTION create_quote_from_extracted_data(uuid, jsonb)
+//   CREATE OR REPLACE FUNCTION public.create_quote_from_extracted_data(p_document_id uuid, p_extracted_data jsonb)
+//    RETURNS uuid
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//   DECLARE
+//     v_quote_id UUID;
+//     v_user_id UUID;
+//   BEGIN
+//     -- Busca o user_id do documento (se tiver reference_id vinculado a um usuário)
+//     SELECT d.reference_id INTO v_user_id
+//     FROM public.documents d
+//     WHERE d.id = p_document_id;
+//   
+//     -- Se reference_id não for um usuário válido, tenta buscar o primeiro usuário do sistema
+//     IF v_user_id IS NULL OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = v_user_id) THEN
+//       SELECT id INTO v_user_id FROM auth.users LIMIT 1;
+//     END IF;
+//   
+//     -- Insere a cotação
+//     INSERT INTO public.quotes (
+//       quote_number,
+//       modal,
+//       agent_name,
+//       origin,
+//       destination,
+//       incoterm,
+//       etd,
+//       eta,
+//       free_time,
+//       weight,
+//       currency,
+//       status,
+//       user_id
+//     ) VALUES (
+//       COALESCE(p_extracted_data->>'quote_number', 'COT-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || SUBSTRING(p_document_id::TEXT, 1, 8)),
+//       COALESCE(p_extracted_data->>'modal', 'FCL'),
+//       COALESCE(p_extracted_data->>'agent_name', 'Agente não identificado'),
+//       COALESCE(p_extracted_data->>'origin', ''),
+//       COALESCE(p_extracted_data->>'destination', ''),
+//       COALESCE(p_extracted_data->>'incoterm', ''),
+//       COALESCE((p_extracted_data->>'etd')::DATE, CURRENT_DATE),
+//       (p_extracted_data->>'eta')::DATE,
+//       COALESCE((p_extracted_data->>'free_time')::INTEGER, 0),
+//       COALESCE((p_extracted_data->>'weight')::NUMERIC, 0),
+//       COALESCE(p_extracted_data->>'currency', 'USD'),
+//       'pending',
+//       v_user_id
+//     )
+//     RETURNING id INTO v_quote_id;
+//   
+//     -- Vincula a nova cotação ao documento
+//     UPDATE public.documents
+//     SET reference_id = v_quote_id,
+//         reference_type = 'quote'
+//     WHERE id = p_document_id;
+//   
+//     -- Insere tarifas se vierem no JSON extraído
+//     IF p_extracted_data ? 'tariffs' AND jsonb_typeof(p_extracted_data->'tariffs') = 'array' THEN
+//       INSERT INTO public.quote_tariffs (quote_id, name, value, currency)
+//       SELECT
+//         v_quote_id,
+//         tariff->>'name',
+//         COALESCE((tariff->>'value')::NUMERIC, 0),
+//         COALESCE(tariff->>'currency', 'USD')
+//       FROM jsonb_array_elements(p_extracted_data->'tariffs') AS tariff;
+//     END IF;
+//   
+//     -- Atualiza documento como concluído
+//     PERFORM public.update_document_status(p_document_id, 'completed', p_extracted_data);
+//   
+//     RETURN v_quote_id;
+//   EXCEPTION WHEN OTHERS THEN
+//     PERFORM public.update_document_status(p_document_id, 'error', NULL, SQLERRM);
+//     RAISE;
+//   END;
+//   $function$
+//   
 // FUNCTION handle_new_usuario()
 //   CREATE OR REPLACE FUNCTION public.handle_new_usuario()
 //    RETURNS trigger
@@ -987,10 +1225,141 @@ export const Constants = {
 //     RETURN NEW;
 //   END;
 //   $function$
-//
+//   
+// FUNCTION handle_storage_upload()
+//   CREATE OR REPLACE FUNCTION public.handle_storage_upload()
+//    RETURNS trigger
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//   DECLARE
+//     v_reference_id UUID;
+//     v_reference_type TEXT;
+//     v_file_type TEXT;
+//   BEGIN
+//     -- Tenta extrair reference_id com tratamento de erro seguro
+//     BEGIN
+//       v_reference_id := (NEW.metadata->>'reference_id')::UUID;
+//     EXCEPTION WHEN OTHERS THEN
+//       v_reference_id := NULL;
+//     END;
+//   
+//     v_reference_type := COALESCE(NEW.metadata->>'reference_type', 'cotacao');
+//     v_file_type := COALESCE(NEW.metadata->>'file_type', 'application/pdf');
+//   
+//     INSERT INTO public.documents (
+//       reference_id,
+//       reference_type,
+//       file_url,
+//       file_type,
+//       original_filename,
+//       status,
+//       created_at
+//     ) VALUES (
+//       v_reference_id,
+//       v_reference_type,
+//       NEW.name,
+//       v_file_type,
+//       NEW.name,
+//       'pending',
+//       NOW()
+//     );
+//   
+//     RETURN NEW;
+//   END;
+//   $function$
+//   
+// FUNCTION process_document_queue()
+//   CREATE OR REPLACE FUNCTION public.process_document_queue()
+//    RETURNS trigger
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//   BEGIN
+//     -- Atualiza status do documento para processing
+//     UPDATE public.documents
+//     SET status = 'processing'
+//     WHERE id = NEW.id;
+//   
+//     -- Log de início de processamento
+//     INSERT INTO public.document_processing_logs (
+//       document_id,
+//       status,
+//       message,
+//       created_at
+//     ) VALUES (
+//       NEW.id,
+//       'processing',
+//       'Documento ' || COALESCE(NEW.original_filename, NEW.file_url) || ' entrou na fila de extração.',
+//       NOW()
+//     );
+//   
+//     RETURN NEW;
+//   EXCEPTION WHEN OTHERS THEN
+//     -- Se der erro no trigger, loga mas não impede o INSERT
+//     INSERT INTO public.document_processing_logs (
+//       document_id,
+//       status,
+//       message,
+//       created_at
+//     ) VALUES (
+//       NEW.id,
+//       'error',
+//       'Erro ao colocar documento na fila: ' || SQLERRM,
+//       NOW()
+//     );
+//     RETURN NEW;
+//   END;
+//   $function$
+//   
+// FUNCTION update_document_status(uuid, text, jsonb, text)
+//   CREATE OR REPLACE FUNCTION public.update_document_status(p_document_id uuid, p_status text, p_extracted_data jsonb DEFAULT NULL::jsonb, p_error_message text DEFAULT NULL::text)
+//    RETURNS void
+//    LANGUAGE plpgsql
+//    SECURITY DEFINER
+//   AS $function$
+//   BEGIN
+//     UPDATE public.documents
+//     SET
+//       status = p_status,
+//       extracted_data = COALESCE(p_extracted_data, extracted_data),
+//       error_message = COALESCE(p_error_message, error_message),
+//       processed_at = CASE
+//         WHEN p_status IN ('completed', 'error') THEN NOW()
+//         ELSE processed_at
+//       END
+//     WHERE id = p_document_id;
+//   
+//     INSERT INTO public.document_processing_logs (
+//       document_id,
+//       status,
+//       message,
+//       created_at
+//     ) VALUES (
+//       p_document_id,
+//       p_status,
+//       CASE
+//         WHEN p_status = 'completed' THEN 'Extração de dados concluída com sucesso.'
+//         WHEN p_status = 'error' THEN 'Erro no processamento: ' || COALESCE(p_error_message, 'Erro desconhecido')
+//         ELSE 'Status atualizado para: ' || p_status
+//       END,
+//       NOW()
+//     );
+//   END;
+//   $function$
+//   
+
+// --- TRIGGERS ---
+// Table: documents
+//   trg_process_document_queue: CREATE TRIGGER trg_process_document_queue AFTER INSERT ON public.documents FOR EACH ROW EXECUTE FUNCTION process_document_queue()
 
 // --- INDEXES ---
 // Table: cotacoes
 //   CREATE UNIQUE INDEX cotacoes_numero_cotacao_key ON public.cotacoes USING btree (numero_cotacao)
+// Table: documents
+//   CREATE INDEX idx_documents_created_at ON public.documents USING btree (created_at DESC)
+//   CREATE INDEX idx_documents_reference_id ON public.documents USING btree (reference_id)
+//   CREATE INDEX idx_documents_status ON public.documents USING btree (status)
 // Table: usuarios
 //   CREATE UNIQUE INDEX usuarios_email_key ON public.usuarios USING btree (email)
+
