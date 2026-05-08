@@ -40,8 +40,15 @@ export default function Login() {
       navigate(location.state?.from?.pathname || '/', { replace: true })
     } catch (error: any) {
       console.error('Auth error:', error)
+      let errorMsg = 'E-mail ou senha incorretos. Verifique suas credenciais.'
+      if (
+        error.message?.toLowerCase().includes('network') ||
+        error.message?.toLowerCase().includes('fetch')
+      ) {
+        errorMsg = 'Sem conexão. Tente novamente.'
+      }
       toast.error('Erro na autenticação', {
-        description: 'E-mail ou senha incorretos. Verifique suas credenciais.',
+        description: errorMsg,
       })
     } finally {
       setLoading(false)
@@ -73,21 +80,23 @@ export default function Login() {
               <div className="space-y-2">
                 <Input
                   type="email"
+                  aria-label="E-mail de acesso"
                   placeholder="seu.nome@brasporto.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-gray-50 h-12 border-gray-200 focus-visible:ring-[#FF6B35]"
+                  className="bg-gray-50 min-h-[48px] border-gray-200 focus-visible:ring-[#FF6B35]"
                 />
               </div>
               <div className="space-y-2">
                 <Input
                   type="password"
+                  aria-label="Senha de acesso"
                   placeholder="Sua senha"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-gray-50 h-12 border-gray-200 focus-visible:ring-[#FF6B35]"
+                  className="bg-gray-50 min-h-[48px] border-gray-200 focus-visible:ring-[#FF6B35]"
                 />
               </div>
             </div>

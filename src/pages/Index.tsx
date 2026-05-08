@@ -38,12 +38,18 @@ export default function Index() {
           current.map((f) => (f.id === pFile.id ? { ...f, status: 'success', data } : f)),
         )
       } catch (error: any) {
+        let errorMsg = 'Erro ao processar. Tente novamente.'
+        if (
+          error.message?.toLowerCase().includes('network') ||
+          error.message?.toLowerCase().includes('fetch')
+        ) {
+          errorMsg = 'Sem conexão. Tente novamente.'
+        } else if (error.status === 401) {
+          errorMsg = 'Sessão expirada. Faça login novamente.'
+        }
+
         setProcessedFiles((current) =>
-          current.map((f) =>
-            f.id === pFile.id
-              ? { ...f, status: 'error', error: error.message || 'Erro desconhecido' }
-              : f,
-          ),
+          current.map((f) => (f.id === pFile.id ? { ...f, status: 'error', error: errorMsg } : f)),
         )
       }
     }
@@ -68,8 +74,18 @@ export default function Index() {
         current.map((f) => (f.id === id ? { ...f, status: 'success', data } : f)),
       )
     } catch (error: any) {
+      let errorMsg = 'Erro ao processar. Tente novamente.'
+      if (
+        error.message?.toLowerCase().includes('network') ||
+        error.message?.toLowerCase().includes('fetch')
+      ) {
+        errorMsg = 'Sem conexão. Tente novamente.'
+      } else if (error.status === 401) {
+        errorMsg = 'Sessão expirada. Faça login novamente.'
+      }
+
       setProcessedFiles((current) =>
-        current.map((f) => (f.id === id ? { ...f, status: 'error', error: error.message } : f)),
+        current.map((f) => (f.id === id ? { ...f, status: 'error', error: errorMsg } : f)),
       )
     }
   }

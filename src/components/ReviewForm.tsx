@@ -175,6 +175,7 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
                   <FormControl>
                     <Input
                       {...field}
+                      aria-label="Número da Cotação"
                       className={cn('bg-gray-50 font-medium', !field.value && 'border-red-300')}
                     />
                   </FormControl>
@@ -193,7 +194,10 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
                   </FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger className={cn(!field.value && 'border-red-300')}>
+                      <SelectTrigger
+                        aria-label="Modal"
+                        className={cn('min-h-[44px]', !field.value && 'border-red-300')}
+                      >
                         <SelectValue placeholder="Selecione..." />
                       </SelectTrigger>
                     </FormControl>
@@ -219,6 +223,7 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
                   <FormControl>
                     <Input
                       {...field}
+                      aria-label="Nome do Agente"
                       placeholder="Ex: DHL Global Forwarding"
                       className={cn(!field.value && 'border-red-300')}
                     />
@@ -560,7 +565,8 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
                 {form.formState.isSubmitting ? 'Salvando...' : 'Salvar e Avançar'}
               </Button>
               {!form.formState.isValid && (
-                <span className="text-[11px] text-red-500 mt-1.5 font-medium bg-red-50 px-2 py-0.5 rounded border border-red-100">
+                <span className="text-xs text-red-600 mt-2 font-medium bg-red-50 px-3 py-1.5 rounded-md border border-red-100 flex items-center">
+                  <AlertTriangle className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
                   Preencha os campos obrigatórios
                 </span>
               )}

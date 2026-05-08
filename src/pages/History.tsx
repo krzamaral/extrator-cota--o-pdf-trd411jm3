@@ -95,7 +95,16 @@ export default function History() {
       setTotal(count || 0)
     } catch (err: any) {
       console.error(err)
-      setError(err.message || 'Erro ao carregar o histórico de cotações.')
+      let errorMsg = 'Erro ao processar. Tente novamente.'
+      if (
+        err.message?.toLowerCase().includes('network') ||
+        err.message?.toLowerCase().includes('fetch')
+      ) {
+        errorMsg = 'Sem conexão. Tente novamente.'
+      } else if (err.status === 401) {
+        errorMsg = 'Sessão expirada. Faça login novamente.'
+      }
+      setError(errorMsg)
     } finally {
       setLoading(false)
       setIsSearching(false)
@@ -185,15 +194,16 @@ export default function History() {
         </Button>
       </div>
 
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 animate-slide-in-bottom">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="relative lg:col-span-2">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" aria-hidden="true" />
             <Input
               placeholder="Buscar por número ou agente..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 h-10 bg-gray-50/50"
+              aria-label="Buscar cotação"
+              className="pl-9 bg-gray-50/50"
             />
             {isSearching && (
               <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-primary" />
@@ -201,7 +211,7 @@ export default function History() {
           </div>
 
           <Select value={modal} onValueChange={setModal}>
-            <SelectTrigger className="h-10 bg-gray-50/50">
+            <SelectTrigger className="min-h-[44px] bg-gray-50/50" aria-label="Filtrar por Modal">
               <SelectValue placeholder="Modal" />
             </SelectTrigger>
             <SelectContent>
@@ -213,7 +223,7 @@ export default function History() {
           </Select>
 
           <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="h-10 bg-gray-50/50">
+            <SelectTrigger className="min-h-[44px] bg-gray-50/50" aria-label="Filtrar por Status">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -226,7 +236,7 @@ export default function History() {
           </Select>
 
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="h-10 bg-gray-50/50">
+            <SelectTrigger className="min-h-[44px] bg-gray-50/50" aria-label="Filtrar por Período">
               <SelectValue placeholder="Período" />
             </SelectTrigger>
             <SelectContent>
@@ -238,7 +248,10 @@ export default function History() {
           </Select>
 
           <Select value={agent} onValueChange={setAgent}>
-            <SelectTrigger className="h-10 bg-gray-50/50 lg:col-start-5">
+            <SelectTrigger
+              className="min-h-[44px] bg-gray-50/50 lg:col-start-5"
+              aria-label="Filtrar por Agente"
+            >
               <SelectValue placeholder="Agente" />
             </SelectTrigger>
             <SelectContent>
@@ -263,8 +276,152 @@ export default function History() {
           </Button>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-slide-in-bottom">
+          {/* Mobile View (Cards) */}
+          <div className="md:hidden divide-y divide-gray-100">
+            {loading && !isSearching ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="h-5 w-24" />
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                  </div>
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-4 w-32" />
+                  <div className="flex justify-between items-center pt-2">
+                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-32" />
+                  </div>
+                </div>
+              ))
+            ) : quotes.length === 0 ? (
+              <div className="p-8 flex flex-col items-center justify-center text-center">
+                <Package className="h-12 w-12 text-gray-300 mb-4" />
+                <h3 className="text-lg font-medium text-[#003366] mb-1">
+                  Nenhuma cotação encontrada
+                </h3>
+                <p className="text-gray-500 mb-4 text-sm">
+                  Ajuste os filtros de busca para encontrar o que procura.
+                </p>
+                <Button onClick={clearFilters} variant="outline">
+                  Limpar Filtros
+                </Button>
+              </div>
+            ) : (
+              quotes.map((quote) => {
+                const nota = Array.isArray(quote.scoring)
+                  ? quote.scoring[0]?.nota_final
+                  : quote.scoring?.nota_final
+                return (
+                  <div key={quote.id} className="p-4 space-y-3 hover:bg-gray-50 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="font-bold text-[#003366] text-base block">
+                          {quote.numero_cotacao}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {format(new Date(quote.created_at), 'dd/MM/yyyy')}
+                        </span>
+                      </div>
+                      <Badge variant="secondary" className={getStatusColor(quote.status)}>
+                        {quote.status?.toUpperCase() || 'DESCONHECIDO'}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <span className="text-gray-500 block text-xs uppercase tracking-wider">
+                          Agente
+                        </span>
+                        <span className="font-medium text-gray-900">{quote.agente}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 block text-xs uppercase tracking-wider">
+                          Modal
+                        </span>
+                        <span className="font-medium text-gray-900">{quote.modal}</span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-gray-500 block text-xs uppercase tracking-wider">
+                          Rota
+                        </span>
+                        <span className="text-gray-900">
+                          {quote.origem} → {quote.destino}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 block text-xs uppercase tracking-wider">
+                          Valor
+                        </span>
+                        <span className="font-bold text-gray-900">
+                          R${' '}
+                          {quote.valor_total?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 block text-xs uppercase tracking-wider">
+                          Nota
+                        </span>
+                        {nota ? (
+                          <Badge variant="outline" className={getScoreColor(nota)}>
+                            {Number(nota).toFixed(1)}
+                          </Badge>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-1 pt-2 border-t border-gray-100 mt-2">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => navigate(`/review/${quote.id}`)}
+                        title="Editar"
+                        aria-label="Editar"
+                        className="h-10 w-10 text-[#003366]"
+                      >
+                        <Edit className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => navigate(`/report?id=${quote.id}`)}
+                        title="Visualizar PDF"
+                        aria-label="Visualizar PDF"
+                        className="h-10 w-10 text-gray-600"
+                      >
+                        <FileText className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleDuplicate(quote.id)}
+                        title="Duplicar"
+                        aria-label="Duplicar"
+                        className="h-10 w-10 text-gray-600"
+                      >
+                        <Copy className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setQuoteToDelete(quote.id)}
+                        title="Deletar"
+                        aria-label="Deletar"
+                        className="h-10 w-10 text-red-500"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+
+          {/* Desktop View (Table) */}
+          <div className="hidden md:block overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50 hover:bg-gray-50 border-b border-gray-200">
@@ -405,7 +562,8 @@ export default function History() {
                               variant="ghost"
                               onClick={() => navigate(`/review/${quote.id}`)}
                               title="Editar"
-                              className="h-8 w-8 text-[#003366] hover:text-[#003366] hover:bg-blue-50"
+                              aria-label="Editar cotação"
+                              className="h-10 w-10 text-[#003366] hover:text-[#003366] hover:bg-blue-50"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -414,7 +572,8 @@ export default function History() {
                               variant="ghost"
                               onClick={() => navigate(`/report?id=${quote.id}`)}
                               title="Visualizar PDF"
-                              className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                              aria-label="Visualizar relatório PDF"
+                              className="h-10 w-10 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                             >
                               <FileText className="h-4 w-4" />
                             </Button>
@@ -423,7 +582,8 @@ export default function History() {
                               variant="ghost"
                               onClick={() => handleDuplicate(quote.id)}
                               title="Duplicar"
-                              className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                              aria-label="Duplicar cotação"
+                              className="h-10 w-10 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                             >
                               <Copy className="h-4 w-4" />
                             </Button>
@@ -432,7 +592,8 @@ export default function History() {
                               variant="ghost"
                               onClick={() => setQuoteToDelete(quote.id)}
                               title="Deletar"
-                              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                              aria-label="Deletar cotação"
+                              className="h-10 w-10 text-red-500 hover:text-red-700 hover:bg-red-50"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
