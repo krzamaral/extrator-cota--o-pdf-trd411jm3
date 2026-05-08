@@ -109,7 +109,7 @@ export default function Scoring() {
 
   const handleGeneratePdf = () => {
     toast.success('Iniciando geração do relatório PDF...')
-    // Placeholder for Fase 4 Navigation: navigate('/report')
+    navigate('/report')
   }
 
   const sortedQuotes = [...quotes].sort((a, b) => b.scores.final - a.scores.final).slice(0, 3)
