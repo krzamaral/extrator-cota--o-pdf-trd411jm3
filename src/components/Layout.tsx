@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, Link } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
@@ -17,15 +17,28 @@ export default function Layout() {
     <div className="min-h-screen flex flex-col bg-slate-50">
       <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3 bg-white px-3 py-1.5 rounded-md shadow-sm">
-            <img src={logoImg} alt="Brasporto Logo" className="h-8 w-auto object-contain" />
-            <span className="font-bold text-lg hidden sm:inline-block uppercase tracking-wider">
-              <span className="text-[#818285]">BRAS</span>
-              <span className="text-[#3A879E]">PORTO</span>{' '}
-              <span className="text-[#818285] font-medium text-xs tracking-widest ml-2">
-                LOGÍSTICA
+          <div className="flex items-center gap-6">
+            <Link
+              to="/"
+              className="flex items-center gap-3 bg-white px-3 py-1.5 rounded-md shadow-sm hover:opacity-90 transition-opacity"
+            >
+              <img src={logoImg} alt="Brasporto Logo" className="h-8 w-auto object-contain" />
+              <span className="font-bold text-lg hidden sm:inline-block uppercase tracking-wider">
+                <span className="text-[#818285]">BRAS</span>
+                <span className="text-[#3A879E]">PORTO</span>{' '}
+                <span className="text-[#818285] font-medium text-xs tracking-widest ml-2">
+                  LOGÍSTICA
+                </span>
               </span>
-            </span>
+            </Link>
+            <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
+              <Link to="/" className="text-white/80 hover:text-white transition-colors">
+                Nova Extração
+              </Link>
+              <Link to="/history" className="text-white/80 hover:text-white transition-colors">
+                Histórico
+              </Link>
+            </nav>
           </div>
           <div className="flex items-center gap-4 text-sm font-medium opacity-90">
             <span className="hidden md:inline-block text-xs bg-white/20 px-2 py-1 rounded-md">

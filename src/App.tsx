@@ -7,6 +7,7 @@ import Index from './pages/Index'
 import Review from './pages/Review'
 import Scoring from './pages/Scoring'
 import Report from './pages/Report'
+import History from './pages/History'
 import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 import Login from './pages/Login'
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/review/:id" element={<Review />} />
             <Route path="/scoring" element={<Scoring />} />
             <Route path="/report" element={<Report />} />
+            <Route path="/history" element={<History />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
