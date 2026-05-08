@@ -1,17 +1,11 @@
 // AVOID UPDATING THIS FILE DIRECTLY. It is automatically generated.
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: '14.5'
   }
   public: {
     Tables: {
@@ -66,11 +60,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cargo_quote_id_fkey"
-            columns: ["quote_id"]
+            foreignKeyName: 'cargo_quote_id_fkey'
+            columns: ['quote_id']
             isOneToOne: false
-            referencedRelation: "quotes"
-            referencedColumns: ["id"]
+            referencedRelation: 'quotes'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -125,18 +119,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "commercial_proposals_client_id_fkey"
-            columns: ["client_id"]
+            foreignKeyName: 'commercial_proposals_client_id_fkey'
+            columns: ['client_id']
             isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
+            referencedRelation: 'clients'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "commercial_proposals_quote_id_fkey"
-            columns: ["quote_id"]
+            foreignKeyName: 'commercial_proposals_quote_id_fkey'
+            columns: ['quote_id']
             isOneToOne: false
-            referencedRelation: "quotes"
-            referencedColumns: ["id"]
+            referencedRelation: 'quotes'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -206,11 +200,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cotacoes_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: 'cotacoes_user_id_fkey'
+            columns: ['user_id']
             isOneToOne: false
-            referencedRelation: "usuarios"
-            referencedColumns: ["id"]
+            referencedRelation: 'usuarios'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -238,11 +232,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "document_processing_logs_document_id_fkey"
-            columns: ["document_id"]
+            foreignKeyName: 'document_processing_logs_document_id_fkey'
+            columns: ['document_id']
             isOneToOne: false
-            referencedRelation: "documents"
-            referencedColumns: ["id"]
+            referencedRelation: 'documents'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -336,11 +330,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "quote_tariffs_quote_id_fkey"
-            columns: ["quote_id"]
+            foreignKeyName: 'quote_tariffs_quote_id_fkey'
+            columns: ['quote_id']
             isOneToOne: false
-            referencedRelation: "quotes"
-            referencedColumns: ["id"]
+            referencedRelation: 'quotes'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -425,11 +419,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "routes_quote_id_fkey"
-            columns: ["quote_id"]
+            foreignKeyName: 'routes_quote_id_fkey'
+            columns: ['quote_id']
             isOneToOne: false
-            referencedRelation: "quotes"
-            referencedColumns: ["id"]
+            referencedRelation: 'quotes'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -472,11 +466,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "scoring_cotacao_id_fkey"
-            columns: ["cotacao_id"]
+            foreignKeyName: 'scoring_cotacao_id_fkey'
+            columns: ['cotacao_id']
             isOneToOne: false
-            referencedRelation: "cotacoes"
-            referencedColumns: ["id"]
+            referencedRelation: 'cotacoes'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -590,33 +584,31 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -625,23 +617,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
+    | keyof DefaultSchema['Tables']
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -650,23 +642,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
+    | keyof DefaultSchema['Tables']
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -675,36 +667,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
+    | keyof DefaultSchema['Enums']
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
+    | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
@@ -712,7 +704,6 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
 
 // ====== DATABASE EXTENDED CONTEXT (auto-generated) ======
 // This section contains actual PostgreSQL column types, constraints, RLS policies,
@@ -1068,7 +1059,7 @@ export const Constants = {
 //     RETURN NEW;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION create_cotacao_from_extracted_data(uuid, jsonb)
 //   CREATE OR REPLACE FUNCTION public.create_cotacao_from_extracted_data(p_document_id uuid, p_extracted_data jsonb)
 //    RETURNS uuid
@@ -1081,7 +1072,7 @@ export const Constants = {
 //   BEGIN
 //     -- Busca um usuário válido do sistema
 //     SELECT id INTO v_user_id FROM auth.users LIMIT 1;
-//   
+//
 //     INSERT INTO public.cotacoes (
 //       user_id,
 //       numero_cotacao,
@@ -1118,21 +1109,21 @@ export const Constants = {
 //       'rascunho'
 //     )
 //     RETURNING id INTO v_cotacao_id;
-//   
+//
 //     UPDATE public.documents
 //     SET reference_id = v_cotacao_id,
 //         reference_type = 'cotacao'
 //     WHERE id = p_document_id;
-//   
+//
 //     PERFORM public.update_document_status(p_document_id, 'completed', p_extracted_data);
-//   
+//
 //     RETURN v_cotacao_id;
 //   EXCEPTION WHEN OTHERS THEN
 //     PERFORM public.update_document_status(p_document_id, 'error', NULL, SQLERRM);
 //     RAISE;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION create_quote_from_extracted_data(uuid, jsonb)
 //   CREATE OR REPLACE FUNCTION public.create_quote_from_extracted_data(p_document_id uuid, p_extracted_data jsonb)
 //    RETURNS uuid
@@ -1147,12 +1138,12 @@ export const Constants = {
 //     SELECT d.reference_id INTO v_user_id
 //     FROM public.documents d
 //     WHERE d.id = p_document_id;
-//   
+//
 //     -- Se reference_id não for um usuário válido, tenta buscar o primeiro usuário do sistema
 //     IF v_user_id IS NULL OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = v_user_id) THEN
 //       SELECT id INTO v_user_id FROM auth.users LIMIT 1;
 //     END IF;
-//   
+//
 //     -- Insere a cotação
 //     INSERT INTO public.quotes (
 //       quote_number,
@@ -1184,13 +1175,13 @@ export const Constants = {
 //       v_user_id
 //     )
 //     RETURNING id INTO v_quote_id;
-//   
+//
 //     -- Vincula a nova cotação ao documento
 //     UPDATE public.documents
 //     SET reference_id = v_quote_id,
 //         reference_type = 'quote'
 //     WHERE id = p_document_id;
-//   
+//
 //     -- Insere tarifas se vierem no JSON extraído
 //     IF p_extracted_data ? 'tariffs' AND jsonb_typeof(p_extracted_data->'tariffs') = 'array' THEN
 //       INSERT INTO public.quote_tariffs (quote_id, name, value, currency)
@@ -1201,17 +1192,17 @@ export const Constants = {
 //         COALESCE(tariff->>'currency', 'USD')
 //       FROM jsonb_array_elements(p_extracted_data->'tariffs') AS tariff;
 //     END IF;
-//   
+//
 //     -- Atualiza documento como concluído
 //     PERFORM public.update_document_status(p_document_id, 'completed', p_extracted_data);
-//   
+//
 //     RETURN v_quote_id;
 //   EXCEPTION WHEN OTHERS THEN
 //     PERFORM public.update_document_status(p_document_id, 'error', NULL, SQLERRM);
 //     RAISE;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION handle_new_usuario()
 //   CREATE OR REPLACE FUNCTION public.handle_new_usuario()
 //    RETURNS trigger
@@ -1225,7 +1216,7 @@ export const Constants = {
 //     RETURN NEW;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION handle_storage_upload()
 //   CREATE OR REPLACE FUNCTION public.handle_storage_upload()
 //    RETURNS trigger
@@ -1243,10 +1234,10 @@ export const Constants = {
 //     EXCEPTION WHEN OTHERS THEN
 //       v_reference_id := NULL;
 //     END;
-//   
+//
 //     v_reference_type := COALESCE(NEW.metadata->>'reference_type', 'cotacao');
 //     v_file_type := COALESCE(NEW.metadata->>'file_type', 'application/pdf');
-//   
+//
 //     INSERT INTO public.documents (
 //       reference_id,
 //       reference_type,
@@ -1264,11 +1255,11 @@ export const Constants = {
 //       'pending',
 //       NOW()
 //     );
-//   
+//
 //     RETURN NEW;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION process_document_queue()
 //   CREATE OR REPLACE FUNCTION public.process_document_queue()
 //    RETURNS trigger
@@ -1280,7 +1271,7 @@ export const Constants = {
 //     UPDATE public.documents
 //     SET status = 'processing'
 //     WHERE id = NEW.id;
-//   
+//
 //     -- Log de início de processamento
 //     INSERT INTO public.document_processing_logs (
 //       document_id,
@@ -1293,7 +1284,7 @@ export const Constants = {
 //       'Documento ' || COALESCE(NEW.original_filename, NEW.file_url) || ' entrou na fila de extração.',
 //       NOW()
 //     );
-//   
+//
 //     RETURN NEW;
 //   EXCEPTION WHEN OTHERS THEN
 //     -- Se der erro no trigger, loga mas não impede o INSERT
@@ -1311,7 +1302,7 @@ export const Constants = {
 //     RETURN NEW;
 //   END;
 //   $function$
-//   
+//
 // FUNCTION update_document_status(uuid, text, jsonb, text)
 //   CREATE OR REPLACE FUNCTION public.update_document_status(p_document_id uuid, p_status text, p_extracted_data jsonb DEFAULT NULL::jsonb, p_error_message text DEFAULT NULL::text)
 //    RETURNS void
@@ -1329,7 +1320,7 @@ export const Constants = {
 //         ELSE processed_at
 //       END
 //     WHERE id = p_document_id;
-//   
+//
 //     INSERT INTO public.document_processing_logs (
 //       document_id,
 //       status,
@@ -1347,7 +1338,7 @@ export const Constants = {
 //     );
 //   END;
 //   $function$
-//   
+//
 
 // --- TRIGGERS ---
 // Table: documents
@@ -1362,4 +1353,3 @@ export const Constants = {
 //   CREATE INDEX idx_documents_status ON public.documents USING btree (status)
 // Table: usuarios
 //   CREATE UNIQUE INDEX usuarios_email_key ON public.usuarios USING btree (email)
-
