@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { Navigate, useLocation } from 'react-router-dom'
 import Index from './pages/Index'
 import Review from './pages/Review'
+import Scoring from './pages/Scoring'
 import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 import Login from './pages/Login'
@@ -40,6 +41,7 @@ const App = () => (
           >
             <Route path="/" element={<Index />} />
             <Route path="/review/:id" element={<Review />} />
+            <Route path="/scoring" element={<Scoring />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

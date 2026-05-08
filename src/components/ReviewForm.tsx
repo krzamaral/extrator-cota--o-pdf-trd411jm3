@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { saveQuoteToDb } from '@/services/quote-service'
@@ -64,6 +65,7 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
+  const navigate = useNavigate()
   const defaultCurrency = initialData.currency || 'USD'
 
   const form = useForm<ReviewFormValues>({
@@ -135,7 +137,7 @@ export function ReviewForm({ initialData, onBack }: ReviewFormProps) {
       toast.success('Cotação salva com sucesso!', {
         description: 'Os dados foram validados e gravados no banco de dados.',
       })
-      setTimeout(onBack, 1500)
+      setTimeout(() => navigate('/scoring'), 1500)
     } catch (error: any) {
       toast.error('Erro ao salvar. Tente novamente.', {
         description: error.message || 'Ocorreu um erro inesperado.',
